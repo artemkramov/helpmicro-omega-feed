@@ -17,7 +17,8 @@ PKG_SOURCE_VERSION:=$(PKG_REV)
 include $(INCLUDE_DIR)/package.mk
 
 define Package/lede-ecr-app
-	CATEGORY:=Libraries
+	CATEGORY:=ECR
+	SECTION:=ECR
 	TITLE:=ECR proxy app
 endef
 
