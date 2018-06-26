@@ -47,6 +47,9 @@ define Package/lede-ecr-app/postinst
 if [ -z "$${IPKG_INSTROOT}" ]; then
 	/etc/init.d/ecr enable
 	
+	touch /etc/config/foobar
+	uci set foobar.sectionName='sectionType'
+	uci set foobar.sectionName.someOption=someValue
 	# Set device as a router
 	uci set firewall.@zone[1].forward='ACCEPT'
 	uci delete firewall.@zone[1].network
