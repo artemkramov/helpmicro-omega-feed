@@ -20,6 +20,7 @@ define Package/lede-ecr-app
 	CATEGORY:=ECR
 	SECTION:=ECR
 	TITLE:=ECR proxy app
+	DEPENDS:=+uci +firewall
 endef
 
 
