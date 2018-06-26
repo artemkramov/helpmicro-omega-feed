@@ -32,6 +32,9 @@ define Build/Compile
         $(CP) ./files/Makefile $(PKG_BUILD_DIR)/makefile
 endef
 
+define Package/lede-ecr-app/conffiles
+/etc/config/firewall
+endef
 
 define Package/lede-ecr-app/install
 	# copy the web site files
@@ -45,9 +48,8 @@ define Package/lede-ecr-app/postinst
 #!bin/sh
 # check if we are on real system
 if [ -z "$${IPKG_INSTROOT}" ]; then
-#	/etc/init.d/ecr enable
+	/etc/init.d/ecr enable
 	
-	echo "Enable ECR"
 	# Set device as a router
 	uci set firewall.@zone[1].forward='ACCEPT'
 	uci delete firewall.@zone[1].network
