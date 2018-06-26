@@ -45,11 +45,9 @@ define Package/lede-ecr-app/postinst
 #!bin/sh
 # check if we are on real system
 if [ -z "$${IPKG_INSTROOT}" ]; then
-	/etc/init.d/ecr enable
+#	/etc/init.d/ecr enable
 	
-	touch /etc/config/foobar
-	uci set foobar.sectionName='sectionType'
-	uci set foobar.sectionName.someOption=someValue
+	echo "Enable ECR"
 	# Set device as a router
 	uci set firewall.@zone[1].forward='ACCEPT'
 	uci delete firewall.@zone[1].network
@@ -59,6 +57,7 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 	uci add_list firewall.@zone[0].network='wlan'
 	uci add_list firewall.@zone[0].network='usb0'
 	uci commit
+	cat /etc/config/firewall > /etc/init.d/ecr
 fi
 exit 0
 endef
