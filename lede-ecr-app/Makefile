@@ -49,17 +49,6 @@ define Package/lede-ecr-app/postinst
 # check if we are on real system
 if [ -z "$${IPKG_INSTROOT}" ]; then
 	/etc/init.d/ecr enable
-	
-	# Set device as a router
-	uci set firewall.@zone[1].forward='ACCEPT'
-	uci delete firewall.@zone[1].network
-	uci add_list firewall.@zone[1].network='wwan'
-	uci add_list firewall.@zone[1].network='wan'
-	uci delete firewall.@zone[0].network
-	uci add_list firewall.@zone[0].network='wlan'
-	uci add_list firewall.@zone[0].network='usb0'
-	uci commit
-	cat /etc/config/firewall > /etc/init.d/ecr
 fi
 exit 0
 endef
