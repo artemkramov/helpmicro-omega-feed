@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lede-ecr-app
-PKG_VERSION:=1.0.12
+PKG_VERSION:=1.0.13
 PKG_RELEASE:=1
 PKG_REV:=HEAD
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)
@@ -34,6 +34,7 @@ endef
 
 define Package/lede-ecr-app/conffiles
 /etc/config/firewall
+/etc/config/foo
 endef
 
 define Package/lede-ecr-app/install
@@ -48,7 +49,6 @@ define Package/lede-ecr-app/postinst
 #!bin/sh
 # check if we are on real system
 if [ -z "$${IPKG_INSTROOT}" ]; then
-	/etc/init.d/ecr enable
 	uci set firewall.@zone[1].forward='ACCEPT'
 	uci delete firewall.@zone[1].network
 	uci add_list firewall.@zone[1].network='wwan'
@@ -56,8 +56,11 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 	uci delete firewall.@zone[0].network
 	uci add_list firewall.@zone[0].network='wlan'
 	uci add_list firewall.@zone[0].network='usb0'
+	uci set foo.sectionName='Data'
 	uci commit
 	/etc/init.d/firewall restart
+	/etc/init.d/ecr enable
+	
 fi
 exit 0
 endef
