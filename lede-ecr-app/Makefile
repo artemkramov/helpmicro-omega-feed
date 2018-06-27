@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lede-ecr-app
-PKG_VERSION:=1.0.19
+PKG_VERSION:=1.0.20
 PKG_RELEASE:=1
 PKG_REV:=HEAD
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)
@@ -42,6 +42,8 @@ define Package/lede-ecr-app/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init.d/ecr $(1)/etc/init.d/ecr
 	$(CP) -r $(PKG_BUILD_DIR)/ecr-app $(1)/www
+	$(INSTALL_DIR) $(1)/etc/config/
+	$(INSTALL_DATA) ./files/firewall.config $(1)/etc/config/firewall
 endef
 
 define Package/lede-ecr-app/postinst
@@ -49,7 +51,6 @@ define Package/lede-ecr-app/postinst
 # check if we are on real system
 if [ -z "$${IPKG_INSTROOT}" ]; then
 	/etc/init.d/ecr enable
-	/etc/init.d/ecr enable_firewall
 fi
 exit 0
 endef
