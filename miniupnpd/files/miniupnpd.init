@@ -96,7 +96,8 @@ start() {
 	local args
 
 	. /lib/functions/network.sh
-
+	. /usr/share/libubox/jshn.sh
+	
 	local ifname
 
         # manual external interface overrides everything
@@ -115,21 +116,29 @@ start() {
 	if [ -n "$conffile" ]; then
 		args="-f $conffile"
 	else
-		local tmpconf="/var/etc/miniupnpd.conf"
+		local manufactureconf="/var/etc/miniupnpd.manufacture.conf"
 		args="-f $tmpconf"
 		mkdir -p /var/etc
-
-		echo "ext_ifname=$ifname" >$tmpconf
+		cp "$manufactureconf" "$tmpconf"
+		echo "ext_ifname=$ifname" >>$tmpconf
 
 		[ -n "$extip" ] && \
-			echo "ext_ip=$extip" >>$tmpconf
+				echo "ext_ip=$extip" >>$tmpconf
 
 		local iface
-		for iface in ${intiface:-lan}; do
-			local device
-			network_get_device device "$iface" && {
-				echo "listening_ip=$device" >>$tmpconf
-			}
+		intiface=$(ubus list | grep 'network.interface.' | tr '\n' ' ')
+		for iface in ${intiface}; do
+				local up
+				local proto
+				local device
+				local status="$(ubus call "$iface" status)"
+				json_load "$status"
+				json_get_var "proto" "proto"
+				json_get_var "up" "up"
+				json_get_var "device" "device"
+				if [ "$up" -eq "1" ] && [ "$proto" = "dhcp" ]; then
+						echo "listening_ip=$device" >>$tmpconf
+				fi
 		done
 
 		[ "$port" != "auto" ] && \
