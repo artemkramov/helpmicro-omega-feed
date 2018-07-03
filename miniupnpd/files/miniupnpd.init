@@ -129,17 +129,17 @@ start() {
 		local iface
 		intiface=$(ubus list | grep 'network.interface.' | tr '\n' ' ')
 		for iface in ${intiface}; do
-				local up
-				local proto
-				local device
-				local status="$(ubus call "$iface" status)"
-				json_load "$status"
-				json_get_var "proto" "proto"
-				json_get_var "up" "up"
-				json_get_var "device" "device"
-				if [ "$up" -eq "1" ] && [ "$proto" = "dhcp" ]; then
-						echo "listening_ip=$device" >>$tmpconf
-				fi
+			local up
+			local proto
+			local device
+			local status="$(ubus call "$iface" status)"
+			json_load "$status"
+			json_get_var "proto" "proto"
+			json_get_var "up" "up"
+			json_get_var "device" "device"
+			if [ "$up" -eq "1" ] && [ "$proto" = "dhcp" ]; then
+					echo "listening_ip=$device" >>$tmpconf
+			fi
 		done
 
 		[ "$port" != "auto" ] && \
