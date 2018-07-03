@@ -116,7 +116,8 @@ start() {
 	if [ -n "$conffile" ]; then
 		args="-f $conffile"
 	else
-		local manufactureconf="/var/etc/miniupnpd.manufacture.conf"
+		local tmpconf="/var/etc/miniupnpd.conf"
+		local manufactureconf="/usr/share/miniupnpd/miniupnpd.manufacture.conf"
 		args="-f $tmpconf"
 		mkdir -p /var/etc
 		cp "$manufactureconf" "$tmpconf"
