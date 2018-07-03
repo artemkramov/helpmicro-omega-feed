@@ -18,10 +18,15 @@ extiface=$(uci get upnpd.config.external_iface)
 extzone=$(uci get upnpd.config.external_zone)
 
 . /lib/functions/network.sh
+. /usr/share/libubox/jshn.sh
 
-for iface in $(uci get upnpd.config.internal_iface); do
-    network_get_device device $iface
-    [ "$DEVICE" = "$device" ] && /etc/init.d/miniupnpd restart && exit 0
+for iface in $(ubus list | grep 'network.interface.' | tr '\n' ' '); do
+    status="$(ubus call "$iface" status)"
+    json_load "$status"
+    json_get_var "device" "device"
+    json_get_var "proto" "proto"
+    logger -t DEBUG "miniupnpd log device '$device' proto '$proto'"
+    [ "$DEVICE" = "$device" ] && [ "$proto" = "dhcp" ] && /etc/init.d/miniupnpd
 done
 
 
