@@ -74,6 +74,7 @@ define Package/miniupnpd/install
 	$(INSTALL_BIN) ./files/miniupnpd.init $(1)/etc/init.d/miniupnpd
 	$(INSTALL_CONF) ./files/upnpd.config $(1)/etc/config/upnpd
 	$(INSTALL_CONF) ./files/miniupnpd.manufacturer.config $(1)/usr/share/miniupnpd/miniupnpd.manufacture.conf
+	$(INSTALL_DATA) ./files/upnp.leases $(1)/usr/share/miniupnpd/upnp.leases
 	$(INSTALL_DATA) ./files/miniupnpd.hotplug $(1)/etc/hotplug.d/iface/50-miniupnpd
 	$(INSTALL_DATA) ./files/miniupnpd.defaults $(1)/etc/uci-defaults/99-miniupnpd
 	$(INSTALL_DATA) ./files/firewall.include $(1)/usr/share/miniupnpd/firewall.include
