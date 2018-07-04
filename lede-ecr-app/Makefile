@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lede-ecr-app
-PKG_VERSION:=1.0.26
+PKG_VERSION:=1.0.27
 PKG_RELEASE:=1
 PKG_REV:=HEAD
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)
@@ -38,9 +38,11 @@ endef
 
 define Package/lede-ecr-app/install
 	# copy the web site files
-	$(INSTALL_DIR) $(1)/www
+	$(INSTALL_DIR) $(1)/www $(1)/usr/share/lede-ecr-util
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init.d/ecr $(1)/etc/init.d/ecr
+	$(INSTALL_BIN) ./files/checkWanStatus.sh $(1)/usr/share/lede-ecr-util/checkWanStatus
+	$(INSTALL_BIN) ./files/wanStatus $(1)/etc/init.d/wanStatus
 	$(CP) -r $(PKG_BUILD_DIR)/ecr-app $(1)/www
 endef
 
@@ -49,6 +51,7 @@ define Package/lede-ecr-app/postinst
 # check if we are on real system
 if [ -z "$${IPKG_INSTROOT}" ]; then
 	/etc/init.d/ecr enable
+	/etc/init.d/wanStatus enable
 fi
 exit 0
 endef
@@ -58,6 +61,7 @@ define Package/lede-ecr-app/prerm
 # check if we are on real system
 if [ -z "$${IPKG_INSTROOT}" ]; then
 	/etc/init.d/ecr disable
+	/etc/init.d/wanStatus disable
 fi
 exit 0
 endef 
