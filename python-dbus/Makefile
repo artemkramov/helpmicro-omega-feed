@@ -8,8 +8,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dbus-python
-PKG_VERSION:=0.83.1
-PKG_RELEASE:=3
+PKG_VERSION:=0.83.0
+PKG_RELEASE:=4
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://dbus.freedesktop.org/releases/dbus-python/
