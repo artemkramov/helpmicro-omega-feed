@@ -20,7 +20,7 @@ PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
-#$(call include_mk, python-package.mk)
+$(call include_mk, python-package.mk)
 
 
 TARGET_LDFLAGS += \
