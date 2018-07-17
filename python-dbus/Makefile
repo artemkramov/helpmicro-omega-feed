@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dbus-python
 PKG_VERSION:=0.83.0
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://dbus.freedesktop.org/releases/dbus-python/
@@ -32,7 +32,7 @@ define Package/dbus-python
   CATEGORY:=Languages
   TITLE:=Python bindings for dbus
   URL:=http://dbus.freedesktop.org/
-  DEPENDS:=+python
+  DEPENDS:=+python +libdbus-glib
 endef
 
 define Package/dbus-python/description
