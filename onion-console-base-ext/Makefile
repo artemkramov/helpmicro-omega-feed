@@ -14,11 +14,11 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 include $(INCLUDE_DIR)/package.mk
 
 define Package/onion-console-base-ext
-        SECTION:=ECR
-        CATEGORY:=ECR
-        SUBMENU:=Console
-        TITLE:=Extended web-based virtual desktop for the Omega
-        DEPENDS:=+onion-console-base
+	SECTION:=ECR
+	CATEGORY:=ECR
+	SUBMENU:=Console
+	TITLE:=Extended web-based virtual desktop for the Omega
+	DEPENDS:=+onion-console-base
 endef
 
 define Package/onion-console-base-ext/description
@@ -26,50 +26,49 @@ Web-based virtual desktop for the Omega. Base package with bluetooth and 3G exte
 endef
 
 define Package/onion-console-base-ext/install
-        # copy the web site files, starting with the lib and element folders
-        $(INSTALL_DIR) $(1)/www/console
-		# Create a lib directory
-        $(INSTALL_DIR) $(1)/www/console/lib
-        # Create a elements directory
-        $(INSTALL_DIR) $(1)/www/console/elements
-        # Create the apps directory
-        $(INSTALL_DIR) $(1)/www/console/apps
-        # Create the directory for the onion-launcher
-        $(INSTALL_DIR) $(1)/www/console/apps/onion-launcher
-        # Create the directort for onion-login
-        $(INSTALL_DIR) $(1)/www/console/apps/onion-login
-        # Create the directory for the onion-settings
-        $(INSTALL_DIR) $(1)/www/console/apps/onion-settings
+	# copy the web site files, starting with the lib and element folders
+	$(INSTALL_DIR) $(1)/www/console
+	# Create a lib directory
+	$(INSTALL_DIR) $(1)/www/console/lib
+	# Create a elements directory
+	$(INSTALL_DIR) $(1)/www/console/elements
+	# Create the apps directory
+	$(INSTALL_DIR) $(1)/www/console/apps
+	# Create the directory for the onion-launcher
+	$(INSTALL_DIR) $(1)/www/console/apps/onion-launcher
+	# Create the directort for onion-login
+	$(INSTALL_DIR) $(1)/www/console/apps/onion-login
+	# Create the directory for the onion-settings
+	$(INSTALL_DIR) $(1)/www/console/apps/onion-settings
 
-        #### Add the app shells
-        $(INSTALL_DIR) $(1)/www/console/apps/onion-editor
-        $(INSTALL_DIR) $(1)/www/console/apps/onion-terminal
-        $(INSTALL_DIR) $(1)/www/console/apps/onion-webcam
+	#### Add the app shells
+	$(INSTALL_DIR) $(1)/www/console/apps/onion-editor
+	$(INSTALL_DIR) $(1)/www/console/apps/onion-terminal
+	$(INSTALL_DIR) $(1)/www/console/apps/onion-webcam
 
-        ### Installing the OLED, RELAY AND PWM
+	### Installing the OLED, RELAY AND PWM
 
-        $(INSTALL_DIR) $(1)/www/console/apps/onion-oled
-        $(INSTALL_DIR) $(1)/www/console/apps/onion-pwm
-        $(INSTALL_DIR) $(1)/www/console/apps/onion-relay
-        $(INSTALL_DIR) $(1)/www/console/apps/onion-gpio
+	$(INSTALL_DIR) $(1)/www/console/apps/onion-oled
+	$(INSTALL_DIR) $(1)/www/console/apps/onion-pwm
+	$(INSTALL_DIR) $(1)/www/console/apps/onion-relay
+	$(INSTALL_DIR) $(1)/www/console/apps/onion-gpio
 
 
-        # Create the services directory
-        $(INSTALL_DIR) $(1)/www/console/services
-        # Create the fonts directory
-        $(INSTALL_DIR) $(1)/www/console/fonts
-        # Create the images directory
-        $(INSTALL_DIR) $(1)/www/console/images
-		
-		rm -r $(1)/www/console/*
-		cp -r ./files/ $(1)/www/console
-        
-		rm -r $(1)/www/console/apps/onion-webcam/onion-webcam.html
+	# Create the services directory
+	$(INSTALL_DIR) $(1)/www/console/services
+	# Create the fonts directory
+	$(INSTALL_DIR) $(1)/www/console/fonts
+	# Create the images directory
+	$(INSTALL_DIR) $(1)/www/console/images
+	rm -r $(1)/www/console/*
+	cp -r ./files/ $(1)/www/console
 
-        rm -r $(1)/www/console/lib/juicy-ace-editor/
-        # cp -r $(PKG_BUILD_DIR)/www/* $(1)/www/console/.
+	rm -r $(1)/www/console/apps/onion-webcam/onion-webcam.html
 
-        # Add the
+	rm -r $(1)/www/console/lib/juicy-ace-editor/
+	# cp -r $(PKG_BUILD_DIR)/www/* $(1)/www/console/.
+
+	# Add the
 endef
 
 $(eval $(call BuildPackage,onion-console-base-ext))
