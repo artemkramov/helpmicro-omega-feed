@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 PKG_NAME:=onion-console-base-ext
-PKG_VERSION:=0.1.4
+PKG_VERSION:=0.1.5
 PKG_RELEASE:=1
 
 
@@ -18,7 +18,7 @@ define Package/onion-console-base-ext
 	CATEGORY:=ECR
 	SUBMENU:=Console
 	TITLE:=Extended web-based virtual desktop for the Omega
-	DEPENDS:=+onion-console-base
+	DEPENDS:=+onion-console
 endef
 
 define Package/onion-console-base-ext/description
