@@ -53,7 +53,10 @@ define Package/onion-console-base-ext/install
 	$(INSTALL_DIR) $(1)/www/console/apps/onion-login
 	# Create the directory for the onion-settings
 	$(INSTALL_DIR) $(1)/www/console/apps/onion-settings
-
+	
+	# Create the directory for bluez python
+	$(INSTALL_DIR) $(1)/usr/bin/pybluez
+	$(INSTALL_BIN) ./files/pybluez/get-adapter-state $(1)/usr/bin/pybluez/get-adapter-state
 
 	# Create the services directory
 	$(INSTALL_DIR) $(1)/www/console/services
