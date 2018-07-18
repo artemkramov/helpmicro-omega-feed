@@ -61,7 +61,7 @@ define Package/onion-console-base-ext/install
 	# Create the images directory
 	$(INSTALL_DIR) $(1)/www/console/images
 	rm -r $(1)/www/console/*
-	cp -r ./files/ $(1)/www/console
+	#cp -r ./files/ $(1)/www/console/
 
 	# cp -r $(PKG_BUILD_DIR)/www/* $(1)/www/console/.
 
