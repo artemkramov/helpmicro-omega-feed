@@ -18,7 +18,7 @@ define Package/onion-console-base-ext
 	CATEGORY:=ECR
 	SUBMENU:=Console
 	TITLE:=Extended web-based virtual desktop for the Omega
-	DEPENDS:=+onion-console
+	DEPENDS:=+rpcd
 endef
 
 define Package/onion-console-base-ext/description
@@ -26,10 +26,22 @@ Web-based virtual desktop for the Omega. Base package with bluetooth and 3G exte
 endef
 
 define Package/onion-console-base-ext/install
+	# install the acl permissions file
+	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/acl.d/onion-console.json $(1)/usr/share/rpcd/acl.d/onion-console.json
+	# install scripts
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/factory-reset.sh $(1)/usr/sbin/factory-reset
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/power-down.sh $(1)/usr/sbin/power-down
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/change-password.sh $(1)/usr/sbin/change-password
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/disk-space.sh $(1)/usr/sbin/disk-space
+	# install the rpcd script
+	$(INSTALL_DIR) $(1)/usr/libexec/rpcd
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/rpcd/onion-console.sh $(1)/usr/libexec/rpcd/onion-console
 	# copy the web site files, starting with the lib and element folders
 	$(INSTALL_DIR) $(1)/www/console
 	# Create a lib directory
-	$(INSTALL_DIR) $(1)/www/console/lib
+	 $(INSTALL_DIR) $(1)/www/console/lib
 	# Create a elements directory
 	$(INSTALL_DIR) $(1)/www/console/elements
 	# Create the apps directory
@@ -40,6 +52,7 @@ define Package/onion-console-base-ext/install
 	$(INSTALL_DIR) $(1)/www/console/apps/onion-login
 	# Create the directory for the onion-settings
 	$(INSTALL_DIR) $(1)/www/console/apps/onion-settings
+
 
 	#### Add the app shells
 	$(INSTALL_DIR) $(1)/www/console/apps/onion-editor
@@ -53,15 +66,14 @@ define Package/onion-console-base-ext/install
 	$(INSTALL_DIR) $(1)/www/console/apps/onion-relay
 	$(INSTALL_DIR) $(1)/www/console/apps/onion-gpio
 
-
 	# Create the services directory
 	$(INSTALL_DIR) $(1)/www/console/services
 	# Create the fonts directory
 	$(INSTALL_DIR) $(1)/www/console/fonts
 	# Create the images directory
 	$(INSTALL_DIR) $(1)/www/console/images
-	rm -r $(1)/www/console/*
-	#cp -r ./files/ $(1)/www/console/
+
+	cp -r ./files/ $(1)/www/console/
 
 	# cp -r $(PKG_BUILD_DIR)/www/* $(1)/www/console/.
 
