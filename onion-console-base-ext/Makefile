@@ -28,16 +28,17 @@ endef
 define Package/onion-console-base-ext/install
 	# install the acl permissions file
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/acl.d/onion-console.json $(1)/usr/share/rpcd/acl.d/onion-console.json
+	$(INSTALL_BIN) ./files/acl.d/onion-console.json $(1)/usr/share/rpcd/acl.d/onion-console.json
 	# install scripts
 	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/factory-reset.sh $(1)/usr/sbin/factory-reset
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/power-down.sh $(1)/usr/sbin/power-down
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/change-password.sh $(1)/usr/sbin/change-password
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/disk-space.sh $(1)/usr/sbin/disk-space
+	$(INSTALL_BIN) ./files/bin/factory-reset.sh $(1)/usr/sbin/factory-reset
+	$(INSTALL_BIN) ./files/bin/power-down.sh $(1)/usr/sbin/power-down
+	$(INSTALL_BIN) ./files/bin/change-password.sh $(1)/usr/sbin/change-password
+	$(INSTALL_BIN) ./files/bin/disk-space.sh $(1)/usr/sbin/disk-space
 	# install the rpcd script
 	$(INSTALL_DIR) $(1)/usr/libexec/rpcd
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/rpcd/onion-console.sh $(1)/usr/libexec/rpcd/onion-console
+	$(INSTALL_BIN) ./files/rpcd/onion-console.sh $(1)/usr/libexec/rpcd/onion-console
+	$(INSTALL_BIN) ./files/rpcd/onion-bt.sh $(1)/usr/libexec/rpcd/onion-bt
 	# copy the web site files, starting with the lib and element folders
 	$(INSTALL_DIR) $(1)/www/console
 	# Create a lib directory
@@ -62,24 +63,24 @@ define Package/onion-console-base-ext/install
 	$(INSTALL_DIR) $(1)/www/console/images
 
 	# copy the lib directory
-	cp -r ./files/lib/* $(1)/www/console/lib/.
+	cp -r ./files/www/lib/* $(1)/www/console/lib/.
 	# copy the elements directory
-	cp -r ./files/elements/* $(1)/www/console/elements/.
+	cp -r ./files/www/elements/* $(1)/www/console/elements/.
 	# copy the fonts directory
-	cp -r ./files/fonts/* $(1)/www/console/fonts/.
+	cp -r ./files/www/fonts/* $(1)/www/console/fonts/.
 	# copy the images directory
-	cp -r ./files/images/* $(1)/www/console/images/.
+	cp -r ./files/www/images/* $(1)/www/console/images/.
 	# copy the services directory
-	cp -r ./files/services/* $(1)/www/console/services/.
+	cp -r ./files/www/services/* $(1)/www/console/services/.
 	# copy other random files
-	cp ./files/.bowerrc $(1)/www/console/.bowerrc
-	cp ./files/bower.json $(1)/www/console/bower.json
-	cp ./files/index.html $(1)/www/console/index.html
+	cp ./files/www/.bowerrc $(1)/www/console/.bowerrc
+	cp ./files/www/bower.json $(1)/www/console/bower.json
+	cp ./files/www/index.html $(1)/www/console/index.html
 	# copy the apps into the directory
 	# copy the launcher app
-	cp -r ./files/apps/onion-launcher/* $(1)/www/console/apps/onion-launcher/.
-	cp -r ./files/apps/onion-settings/* $(1)/www/console/apps/onion-settings/.
-	cp -r ./files/apps/onion-login/* $(1)/www/console/apps/onion-login/.
+	cp -r ./files/www/apps/onion-launcher/* $(1)/www/console/apps/onion-launcher/.
+	cp -r ./files/www/apps/onion-settings/* $(1)/www/console/apps/onion-settings/.
+	cp -r ./files/www/apps/onion-login/* $(1)/www/console/apps/onion-login/.
 
 endef
 

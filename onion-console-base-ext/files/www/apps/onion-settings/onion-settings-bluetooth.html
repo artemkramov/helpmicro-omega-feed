@@ -1,0 +1,168 @@
+<link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../../lib/iron-icons/iron-icons.html">
+
+<dom-module id="onion-settings-bluetooth">
+	<style>
+		body {
+			background-color: #f2f2f2;
+			padding-top: 4rem;
+			padding-bottom: 4rem;
+		}
+
+		.main {
+			background-color: #fff;
+			border-color: transparent;
+			padding: 4rem 2rem;
+			margin-bottom: 0;
+		}
+
+		.container {
+			width: 600px;
+			margin: 0 auto;
+		}
+
+		.card {
+			margin-top: 15px;
+			background-color: #fff;
+		}
+			.card form > .form-group:last-child {
+				margin-bottom: 0;
+			}
+
+		.loading{
+			height: 20px;
+			width: 20px;
+			margin-left: 15px;
+			-webkit-animation: rotation 1s infinite linear;
+			-moz-animation: rotation 1s infinite linear;
+			-o-animation: rotation 1s infinite linear;
+			animation: rotation 1s infinite linear;
+			border-left: 3px solid #EAF1FF;
+			border-right: 3px solid #EAF1FF;
+			border-bottom: 3px solid #EAF1FF;
+			border-top: 3px solid #2450AD;
+			border-radius: 100%
+		}
+
+		@-webkit-keyframes rotation {
+			from{
+				-webkit-transform: rotate(0deg)
+			}
+			to{
+				-webkit-transform: rotate(359deg)
+			}
+		}
+
+		@-moz-keyframes rotation {
+			from{
+				-moz-transform: rotate(0deg)
+			}
+			to{
+				-moz-transform: rotate(359deg)
+			}
+		}
+
+		@-o-keyframes rotation {
+			from{
+				-o-transform: rotate(0deg)
+			}
+			to{
+				-o-transform: rotate(359deg)
+			}
+		}
+
+		@keyframes rotation {
+			from{
+				transform: rotate(0deg)
+			}
+			to{
+				transform: rotate(359deg)
+			}
+		}
+		
+		#enableBluetooth.onion-settings-bluetooth {
+			margin-left: 20px;
+		}
+	</style>
+
+	<template>
+		<div class="container">
+			<h4 class="card-title">Bluetooth Setup</h4>
+			<div class="card card-block">
+				<div id="globalControl" class="layout horizontal center">
+					<div class="userInput">Bluetooth Enabled</div>
+					<!-- lazar@onion.io: TODO: need to figure out a way to give the user the option to disable connecting to STA  -->
+					<input type="checkbox" id="enableBluetooth" checked="{{enableBluetooth::change}}" autocomplete="off" class="userInput" />
+					<div class="flex"></div><!-- space holder -->
+				</div>
+			</div>
+		</div>
+	</template>
+
+	<script>
+		'use strict';
+
+		(function () {
+			// var this = null;
+
+			var created = function () {
+				// this = this;
+			};
+
+			var ready = function () {
+				onionConsole.getService('onion-session-provider', function (err, sessionProvider) {
+                    this.sessionProvider = sessionProvider;
+	                onionConsole.getService('onion-bluetooth-provider', function (err, bluetoothProvider) {
+                        this.bluetoothProvider = bluetoothProvider;
+					}.bind(this));
+                }.bind(this));
+
+     //            if (this.sessionProvider.isAlive() === true) {
+     //                onionConsole.getService('onion-wifi-provider', function (err, wifiProvider) {
+     //                    this.wifiProvider = wifiProvider;
+					// });
+     //            };
+
+			};
+
+			var init = function () {
+				
+			};
+
+
+			var setLoading = function (bLoading) {
+				if (bLoading) {
+					this.$.configureLoading.hidden = false;
+			    	this.$['ap-config-button'].disabled = true;
+				} else {
+					this.$.configureLoading.hidden = true;
+		    		this.$['ap-config-button'].disabled = false;
+				}
+			};
+
+			var onAppIcon = function (e) {
+				this.onionConsole.launchApp(e.target);
+			};
+
+
+			var _computeShowPassword = function (showPassword) {
+				return showPassword ? 'text' : 'password';
+			};
+
+			Polymer({
+				is: 'onion-settings-bluetooth',
+				created: created,
+				ready: ready,
+				init: init,
+				setLoading: setLoading,
+				properties: {
+					enableBluetooth: {
+						type: Boolean,
+						notify: true,
+						observer: "enableWifiChanged"
+					}
+				}
+			});
+		})();
+	</script>
+</dom-module>

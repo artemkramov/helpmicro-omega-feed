@@ -12,6 +12,7 @@
 <link rel="import" href="./onion-settings-restore.html">
 <link rel="import" href="./onion-settings-cloud.html">
 <link rel="import" href="./onion-settings-status.html">
+<link rel="import" href="./onion-settings-bluetooth.html">
 
 
 <dom-module id="onion-settings">
@@ -77,7 +78,7 @@
     						<onion-settings-ap id="onion-settings-ap"></onion-settings-ap>
     						<onion-settings-update id="onion-settings-update"></onion-settings-update>
     						<onion-settings-restore id="onion-settings-restore"></onion-settings-restore>
-    						<onion-settings-cloud id="onion-settings-cloud"></onion-settings-cloud>
+							<onion-settings-bluetooth id="onion-settings-bluetooth"></onion-settings-bluetooth>
     					</iron-pages>
                     </div>
 					
@@ -131,9 +132,9 @@
 						page: 'onion-settings-restore'
 					},
 					{
-						name: 'Cloud Settings',
-						icon: 'icons:cloud',
-						page: 'onion-settings-cloud'
+						name: 'Bluetooth',
+						icon: 'icons:settings-bluetooth',
+						page: 'onion-settings-bluetooth'
 					}
 				];
 			};
