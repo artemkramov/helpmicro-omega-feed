@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lede-ecr-app
-PKG_VERSION:=1.0.27
+PKG_VERSION:=1.0.28
 PKG_RELEASE:=1
 PKG_REV:=HEAD
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)
@@ -20,7 +20,7 @@ define Package/lede-ecr-app
 	CATEGORY:=ECR
 	SECTION:=ECR
 	TITLE:=ECR proxy app
-	DEPENDS:=+uci +firewall +nodejs
+	DEPENDS:=+uci +firewall +nodejs +bluez-daemon
 endef
 
 
@@ -43,6 +43,7 @@ define Package/lede-ecr-app/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init.d/ecr $(1)/etc/init.d/ecr
 	$(INSTALL_BIN) ./files/checkWanStatus.sh $(1)/usr/share/lede-ecr-util/checkWanStatus
 	$(INSTALL_BIN) ./files/wanStatus $(1)/etc/init.d/wanStatus
+	$(INSTALL_DATA) ./files/bluetooth.conf $(1)/etc/dbus-1/system.d/bluetooth.conf
 	$(CP) -r $(PKG_BUILD_DIR)/ecr-app $(1)/www
 endef
 
