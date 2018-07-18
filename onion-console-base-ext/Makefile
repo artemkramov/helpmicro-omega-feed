@@ -54,18 +54,6 @@ define Package/onion-console-base-ext/install
 	$(INSTALL_DIR) $(1)/www/console/apps/onion-settings
 
 
-	#### Add the app shells
-	$(INSTALL_DIR) $(1)/www/console/apps/onion-editor
-	$(INSTALL_DIR) $(1)/www/console/apps/onion-terminal
-	$(INSTALL_DIR) $(1)/www/console/apps/onion-webcam
-
-	### Installing the OLED, RELAY AND PWM
-
-	$(INSTALL_DIR) $(1)/www/console/apps/onion-oled
-	$(INSTALL_DIR) $(1)/www/console/apps/onion-pwm
-	$(INSTALL_DIR) $(1)/www/console/apps/onion-relay
-	$(INSTALL_DIR) $(1)/www/console/apps/onion-gpio
-
 	# Create the services directory
 	$(INSTALL_DIR) $(1)/www/console/services
 	# Create the fonts directory
@@ -92,18 +80,6 @@ define Package/onion-console-base-ext/install
 	cp -r ./files/apps/onion-launcher/* $(1)/www/console/apps/onion-launcher/.
 	cp -r ./files/apps/onion-settings/* $(1)/www/console/apps/onion-settings/.
 	cp -r ./files/apps/onion-login/* $(1)/www/console/apps/onion-login/.
-
-	cp -r ./files/apps/onion-oled/* $(1)/www/console/apps/onion-oled/.
-	cp -r ./files/apps/onion-gpio/* $(1)/www/console/apps/onion-gpio/.
-	cp -r ./files/apps/onion-pwm/* $(1)/www/console/apps/onion-pwm/.
-	cp -r ./files/apps/onion-relay/* $(1)/www/console/apps/onion-relay/.
-
-	## Adding the index page
-
-	cp -r ./files/apps/onion-editor/* $(1)/www/console/apps/onion-editor/.
-	cp -r ./files/apps/onion-terminal/* $(1)/www/console/apps/onion-terminal/.
-
-	cp -r ./files/apps/onion-webcam/* $(1)/www/console/apps/onion-webcam/.
 
 endef
 
