@@ -73,11 +73,43 @@ define Package/onion-console-base-ext/install
 	# Create the images directory
 	$(INSTALL_DIR) $(1)/www/console/images
 
-	cp -r ./files/ $(1)/www/console/
+	# copy the lib directory
+	cp -r ./files/lib/* $(1)/www/console/lib/.
+	# copy the elements directory
+	cp -r ./files/elements/* $(1)/www/console/elements/.
+	# copy the fonts directory
+	cp -r ./files/fonts/* $(1)/www/console/fonts/.
+	# copy the images directory
+	cp -r ./files/images/* $(1)/www/console/images/.
+	# copy the services directory
+	cp -r ./files/services/* $(1)/www/console/services/.
+	# copy other random files
+	cp ./files/.bowerrc $(1)/www/console/.bowerrc
+	cp ./files/bower.json $(1)/www/console/bower.json
+	cp ./files/index.html $(1)/www/console/index.html
+	# copy the apps into the directory
+	# copy the launcher app
+	cp -r ./files/apps/onion-launcher/* $(1)/www/console/apps/onion-launcher/.
+	cp -r ./files/apps/onion-settings/* $(1)/www/console/apps/onion-settings/.
+	cp -r ./files/apps/onion-login/* $(1)/www/console/apps/onion-login/.
 
-	# cp -r $(PKG_BUILD_DIR)/www/* $(1)/www/console/.
+	cp -r ./files/apps/onion-oled/* $(1)/www/console/apps/onion-oled/.
+	cp -r ./files/apps/onion-gpio/* $(1)/www/console/apps/onion-gpio/.
+	cp -r ./files/apps/onion-pwm/* $(1)/www/console/apps/onion-pwm/.
+	cp -r ./files/apps/onion-relay/* $(1)/www/console/apps/onion-relay/.
 
-	# Add the
+	## Adding the index page
+
+	cp -r ./files/apps/onion-editor/* $(1)/www/console/apps/onion-editor/.
+	rm -r $(1)/www/console/apps/onion-editor/onion-editor.html
+	cp -r ./files/apps/onion-terminal/* $(1)/www/console/apps/onion-terminal/.
+	rm -r $(1)/www/console/apps/onion-terminal/onion-terminal.html
+
+	cp -r ./files/apps/onion-webcam/* $(1)/www/console/apps/onion-webcam/.
+	rm -r $(1)/www/console/apps/onion-webcam/onion-webcam.html
+
+	rm -r $(1)/www/console/lib/juicy-ace-editor/
+
 endef
 
 $(eval $(call BuildPackage,onion-console-base-ext))
