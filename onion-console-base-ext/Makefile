@@ -63,9 +63,6 @@ define Package/onion-console-base-ext/install
 	rm -r $(1)/www/console/*
 	cp -r ./files/ $(1)/www/console
 
-	rm -r $(1)/www/console/apps/onion-webcam/onion-webcam.html
-
-	rm -r $(1)/www/console/lib/juicy-ace-editor/
 	# cp -r $(PKG_BUILD_DIR)/www/* $(1)/www/console/.
 
 	# Add the
