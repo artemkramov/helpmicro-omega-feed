@@ -101,14 +101,9 @@ define Package/onion-console-base-ext/install
 	## Adding the index page
 
 	cp -r ./files/apps/onion-editor/* $(1)/www/console/apps/onion-editor/.
-	rm -r $(1)/www/console/apps/onion-editor/onion-editor.html
 	cp -r ./files/apps/onion-terminal/* $(1)/www/console/apps/onion-terminal/.
-	rm -r $(1)/www/console/apps/onion-terminal/onion-terminal.html
 
 	cp -r ./files/apps/onion-webcam/* $(1)/www/console/apps/onion-webcam/.
-	rm -r $(1)/www/console/apps/onion-webcam/onion-webcam.html
-
-	rm -r $(1)/www/console/lib/juicy-ace-editor/
 
 endef
 
