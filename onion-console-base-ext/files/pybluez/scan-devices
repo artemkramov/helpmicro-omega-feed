@@ -1,0 +1,50 @@
+#!/usr/bin/python
+
+from __future__ import absolute_import, print_function, unicode_literals
+
+from optparse import OptionParser, make_option
+import dbus
+import dbus.mainloop.glib
+import json
+try:
+  from gi.repository import GObject
+except ImportError:
+  import gobject as GObject
+import bluezutils
+
+adapter = {}
+mainloop = {}
+TIMEOUT = 8000
+
+def handler():
+	adapter.StopDiscovery()
+	mainloop.quit()
+	response = {"devices": []}
+	om = dbus.Interface(bus.get_object("org.bluez", "/"), "org.freedesktop.DBus.ObjectManager")
+	objects = om.GetManagedObjects()
+	for path, interfaces in objects.iteritems():
+		if "org.bluez.Device1" in interfaces:
+			device = interfaces["org.bluez.Device1"]
+			response["devices"].append({
+				"Alias": device["Alias"],
+				"Address": device["Address"],
+				"Paired": device["Paired"],
+				"Connected": device["Connected"]
+			})
+	print(json.dumps(response))		
+
+if __name__ == '__main__':
+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+	GObject.timeout_add(TIMEOUT, handler)
+
+	bus = dbus.SystemBus()
+
+	adapter = bluezutils.find_adapter()
+
+	scan_filter = dict()
+
+	adapter.SetDiscoveryFilter(scan_filter)
+	adapter.StartDiscovery()
+
+	mainloop = GObject.MainLoop()
+	mainloop.run()

@@ -58,6 +58,7 @@ define Package/onion-console-base-ext/install
 	$(INSTALL_DIR) $(1)/usr/bin/pybluez
 	$(INSTALL_BIN) ./files/pybluez/get-adapter-state $(1)/usr/bin/pybluez/get-adapter-state
 	$(INSTALL_BIN) ./files/pybluez/set-adapter-state $(1)/usr/bin/pybluez/set-adapter-state
+	$(INSTALL_BIN) ./files/pybluez/scan-devices $(1)/usr/bin/pybluez/scan-devices
 	$(INSTALL_BIN) ./files/pybluez/bluezutils.py $(1)/usr/bin/pybluez/bluezutils.py
 
 	# Create the services directory

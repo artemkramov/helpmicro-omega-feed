@@ -77,16 +77,28 @@
 			}
 		}
 		
-		#enableBluetooth.onion-settings-bluetooth {
+		#enable-bluetooth.onion-settings-bluetooth {
 			margin-left: 20px;
 		}
 		
-		.userInput {
+		.user-input {
 			display: var(--user-input-visibility);
 		}
 		
-		.bluetooth-message-box {
-			display: var(--message-box-visibility);
+		.bluetoothBlock {
+			margin-top: 20px;
+			display: var(--bluetooth-block-visibility);
+		}
+		
+		#scan-refresh-icon {
+			display: inline-block;
+		}
+		
+		#scan-refresh-icon.animate {
+			-webkit-animation: rotation 1s infinite linear;
+			-moz-animation: rotation 1s infinite linear;
+			-o-animation: rotation 1s infinite linear;
+			animation: rotation 1s infinite linear;
 		}
 		
 		
@@ -98,9 +110,54 @@
 			<div class="card card-block">
 				<div id="configureLoading" class="loading"></div>
 				<div id="globalControl" class="layout horizontal center">
-					<div class="userInput">Bluetooth Enabled</div>
-					<input type="checkbox" id="enableBluetooth" checked="{{enableBluetooth::change}}" autocomplete="off" class="userInput" />
+					<div class="user-input">Bluetooth Enabled</div>
+					<input type="checkbox" id="enable-bluetooth" checked="{{enableBluetooth::change}}" autocomplete="off" class="user-input" disabled="{{disableInputs}}" />
 					<div class="flex"></div><!-- space holder -->
+				</div>
+				<div class="layout user-input">
+					<div class="bluetoothBlock">
+						<div class="bluetooth-scan">
+							<button id="bluetooth-scan-btn" type="button" class="btn btn-block btn-primary" on-click="scanBluetoothDevices" disabled="{{disableInputs}}">
+								<span id="scan-refresh-icon" class$="{{_getClass(animated)}}"><iron-icon icon="icons:refresh"></iron-icon></span> Scan devices
+							</button>
+							<table id="bluetooth-devices" class="table">
+								<thead>
+									<tr>
+										<th>Alias</th>
+										<th>Address</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+									<template is="dom-if" if="[[_isListEmpty(devices)]]">
+										 <tr>
+											<td colspan="4">No devices were found</td>
+										 </tr>
+									</template>
+									<template is="dom-if" if="[[!_isListEmpty(devices)]]">
+										 <template is="dom-repeat" items="{{devices}}">
+											 <tr>
+												<td>{{item.Alias}}</td>
+												<td>{{item.Address}}</td>
+												<td>
+													<template is="dom-if" if="[[!item.Paired]]">
+														<button class="btn btn-default">Pair</button>
+													</template>
+													<template is="dom-if" if="[[_isDeviceReadyToConnect(item)]]">
+														<button class="btn btn-default">Connect</button>
+													</template>
+													<template is="dom-if" if="[[item.Connected]]">
+														<button class="btn btn-default">Disonnect</button>
+													</template>
+												</td>
+											 </tr>
+										 </template>
+									</template>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					
 				</div>
 			</div>
 		</div>
@@ -135,10 +192,14 @@
 				this.onLoading(true);
 				this.bluetoothProvider.getState(null)
 				.then(function(result){
-					this._setAttributeWithoutObserving("enableBluetooth", result.isPowerOn);
+					this._setBluetoothEnable(result.isPowerOn);
 					this.onLoading(false);
 				}.bind(this))
 				.catch(function (err) {
+					onionConsole.sendNotification({
+						title: 'Error',
+						message: err
+					});
 					self.onLoading(false);
 				});
 			};
@@ -151,27 +212,77 @@
 					var powerAlias = newState ? "on" : "off";
 					this.bluetoothProvider.setAdapterPower(null, powerAlias)
 					.then(function(result){
-						this._setAttributeWithoutObserving("enableBluetooth", result.isPowerOn);
+						this._setBluetoothEnable(result.isPowerOn);
 						this.onLoading(false);
 					}.bind(this))
 					.catch(function (err) {
-						self._setAttributeWithoutObserving("enableBluetooth", !newState);
+						self._setBluetoothEnable(!newState);
 						onionConsole.sendNotification({
 							title: 'Error',
 							message: err
-						})
+						});
 						self.onLoading(false);
 					});
 				}
 				else {
-					this._setAttributeWithoutObserving("enableBluetooth", !newState);
+					this._setBluetoothEnable(!newState);
 				}
+			}
+			
+			var onScanLoading = function (bLoading) {
+				if (bLoading) {
+					this.disableInputs = true;
+					this.animated = true;
+				}
+				else {
+					this.disableInputs = false;
+					this.animated = false;
+				}
+			}
+			
+			var scanBluetoothDevices = function () {
+				this.onScanLoading(true);
+				var self = this;
+				this.bluetoothProvider.getDevices(null)
+					.then(function(result) {
+						self.devices = result.devices;
+						this.onScanLoading(false);
+					}.bind(this))
+					.catch(function (err) {
+						self.devices = [];
+						onionConsole.sendNotification({
+							title: 'Error',
+							message: err
+						});
+						this.onScanLoading(false);
+					});
 			}
 			
 			var _setAttributeWithoutObserving = function (attribute, value) {
 				this._observerLock = true;
 				this[attribute] = value;
 				this._observerLock = false;
+			}
+			
+			var _setBluetoothEnable = function (value) {
+				this._setAttributeWithoutObserving("enableBluetooth", value);
+				if (value) {
+					this.customStyle['--bluetooth-block-visibility'] = 'block';
+				}
+				else {
+					this.customStyle['--bluetooth-block-visibility'] = 'none';
+				}
+				this.updateStyles();
+			}
+			
+			
+			
+			var _getClass = function(animated) {
+				return animated ? "animate" : "";
+			}
+			
+			var _isDeviceReadyToConnect = function (device) {
+				return device.Paired == 1 && device.Connected == 0;
 			}
 
 			
@@ -195,13 +306,33 @@
 				init: init,
 				getState: getState,
 				onLoading: onLoading,
+				onScanLoading: onScanLoading,
 				enableBluetoothChanged: enableBluetoothChanged,
+				scanBluetoothDevices: scanBluetoothDevices,
 				_setAttributeWithoutObserving: _setAttributeWithoutObserving,
+				_setBluetoothEnable: _setBluetoothEnable,
+				_getClass: _getClass,
+				_isDeviceReadyToConnect: _isDeviceReadyToConnect,
+				_isListEmpty: function (list) {
+					return list.length == 0;
+				},
 				properties: {
 					enableBluetooth: {
 						type: Boolean,
 						notify: true,
 						observer: "enableBluetoothChanged"
+					},
+					disableInputs: {
+						type: Boolean,
+						value: false,
+					},
+					animated: {
+						type: Boolean,
+						value: false
+					},
+					devices: {
+						type: Array,
+						value: []
 					}
 				}
 			});

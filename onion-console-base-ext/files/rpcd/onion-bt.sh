@@ -5,7 +5,7 @@
 
 case "$1" in
    list)
-        echo '{"state": {}, "power": {}}'
+        echo '{"state": {}, "power": {}, "scan": {}}'
    ;;
    call)
         case "$2" in
@@ -21,6 +21,9 @@ case "$1" in
 			json_get_var "state" "state"
 			/usr/bin/pybluez/set-adapter-state "$state"	
                 ;;
+		scan)
+			/usr/bin/pybluez/scan-devices
+		;;
         esac
    ;;
 esac

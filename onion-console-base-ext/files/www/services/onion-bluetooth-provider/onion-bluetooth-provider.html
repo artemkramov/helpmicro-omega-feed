@@ -19,8 +19,6 @@
 
 				// set the deviceRadio based on the device type
 				onionConsole.getService('onion-device-provider', function (err, deviceProvider) {
-					console.log("DeviceProvider:",deviceProvider);
-					console.log("err:",err);
 					this.deviceProvider = deviceProvider;
 				}.bind(this));
 			};
@@ -28,16 +26,14 @@
 			var getState = function (devId) {
 				var promise = new Promise(function (resolve, reject) {
 					this.deviceProvider.callService(devId, "onion-bt", 'state', {
-						
 					}, function (err, response) {
-						if (response) {
+						if (response && response.isDeviceDetected) {
 							resolve( response );
 						} else {
-							reject(Error('Unable to read current bluetooth state.'));
+							reject('Unable to detect the bluetooth device.');
 						}
 					}.bind(this));
 				}.bind(this));
-
 				return promise;
 			}
 
@@ -56,6 +52,22 @@
 
 				return promise;
 			}
+			
+			var getDevices = function (devId) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'scan', {
+						
+					}, function (err, response) {
+						if (response && response.devices) {
+							resolve(response);
+						} else {
+							reject('Unable to fetch devices.');
+						}
+					}.bind(this));
+				}.bind(this));
+
+				return promise;
+			}
 
 			
 
@@ -68,7 +80,7 @@
 				//Get state
 				getState: getState,
 				setAdapterPower: setAdapterPower,
-
+				getDevices: getDevices,
 				properties: {
 				}
 			});
