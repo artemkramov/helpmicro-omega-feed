@@ -3,11 +3,6 @@
 
 <dom-module id="onion-settings-bluetooth">
 	<style>
-		body {
-			background-color: #f2f2f2;
-			padding-top: 4rem;
-			padding-bottom: 4rem;
-		}
 
 		.main {
 			background-color: #fff;
@@ -30,17 +25,19 @@
 			}
 
 		.loading{
-			height: 20px;
-			width: 20px;
+			display: var(--loading-visibility);
+			margin: var(--loading-visibility-margin);
+			height: 100px;
+			width: 100px;
 			margin-left: 15px;
 			-webkit-animation: rotation 1s infinite linear;
 			-moz-animation: rotation 1s infinite linear;
 			-o-animation: rotation 1s infinite linear;
 			animation: rotation 1s infinite linear;
-			border-left: 3px solid #EAF1FF;
-			border-right: 3px solid #EAF1FF;
-			border-bottom: 3px solid #EAF1FF;
-			border-top: 3px solid #2450AD;
+			border-left: 6px solid #EAF1FF;
+			border-right: 6px solid #EAF1FF;
+			border-bottom: 6px solid #EAF1FF;
+			border-top: 6px solid #2450AD;
 			border-radius: 100%
 		}
 
@@ -83,15 +80,25 @@
 		#enableBluetooth.onion-settings-bluetooth {
 			margin-left: 20px;
 		}
+		
+		.userInput {
+			display: var(--user-input-visibility);
+		}
+		
+		.bluetooth-message-box {
+			display: var(--message-box-visibility);
+		}
+		
+		
 	</style>
 
 	<template>
 		<div class="container">
 			<h4 class="card-title">Bluetooth Setup</h4>
 			<div class="card card-block">
+				<div id="configureLoading" class="loading"></div>
 				<div id="globalControl" class="layout horizontal center">
 					<div class="userInput">Bluetooth Enabled</div>
-					<!-- lazar@onion.io: TODO: need to figure out a way to give the user the option to disable connecting to STA  -->
 					<input type="checkbox" id="enableBluetooth" checked="{{enableBluetooth::change}}" autocomplete="off" class="userInput" />
 					<div class="flex"></div><!-- space holder -->
 				</div>
@@ -112,54 +119,89 @@
 			var ready = function () {
 				onionConsole.getService('onion-session-provider', function (err, sessionProvider) {
                     this.sessionProvider = sessionProvider;
-	                onionConsole.getService('onion-bluetooth-provider', function (err, bluetoothProvider) {
-                        this.bluetoothProvider = bluetoothProvider;
+					onionConsole.getService('onion-bluetooth-provider', function (err, bluetoothProvider) {
+						this.bluetoothProvider = bluetoothProvider;
 					}.bind(this));
                 }.bind(this));
-
-     //            if (this.sessionProvider.isAlive() === true) {
-     //                onionConsole.getService('onion-wifi-provider', function (err, wifiProvider) {
-     //                    this.wifiProvider = wifiProvider;
-					// });
-     //            };
 
 			};
 
 			var init = function () {
-				
+				this.getState();
 			};
-
-
-			var setLoading = function (bLoading) {
-				if (bLoading) {
-					this.$.configureLoading.hidden = false;
-			    	this.$['ap-config-button'].disabled = true;
-				} else {
-					this.$.configureLoading.hidden = true;
-		    		this.$['ap-config-button'].disabled = false;
+			
+			var getState = function () {
+				var self = this;
+				this.onLoading(true);
+				this.bluetoothProvider.getState(null)
+				.then(function(result){
+					this._setAttributeWithoutObserving("enableBluetooth", result.isPowerOn);
+					this.onLoading(false);
+				}.bind(this))
+				.catch(function (err) {
+					self.onLoading(false);
+				});
+			};
+			
+			var enableBluetoothChanged = function (newState) {
+				if (this._observerLock) { return; }
+				var self = this;
+				if (confirm('Are you sure you want to change the Bluetooth state?')) {
+					this.onLoading(true);
+					var powerAlias = newState ? "on" : "off";
+					this.bluetoothProvider.setAdapterPower(null, powerAlias)
+					.then(function(result){
+						this._setAttributeWithoutObserving("enableBluetooth", result.isPowerOn);
+						this.onLoading(false);
+					}.bind(this))
+					.catch(function (err) {
+						self._setAttributeWithoutObserving("enableBluetooth", !newState);
+						onionConsole.sendNotification({
+							title: 'Error',
+							message: err
+						})
+						self.onLoading(false);
+					});
 				}
-			};
+				else {
+					this._setAttributeWithoutObserving("enableBluetooth", !newState);
+				}
+			}
+			
+			var _setAttributeWithoutObserving = function (attribute, value) {
+				this._observerLock = true;
+				this[attribute] = value;
+				this._observerLock = false;
+			}
 
-			var onAppIcon = function (e) {
-				this.onionConsole.launchApp(e.target);
-			};
-
-
-			var _computeShowPassword = function (showPassword) {
-				return showPassword ? 'text' : 'password';
-			};
+			
+			var onLoading = function (bLoading) {
+				if (!bLoading) {
+					this.customStyle['--loading-visibility'] = 'none';
+					this.customStyle['--user-input-visibility'] = 'block';
+					this.updateStyles();
+				} else {
+					this.customStyle['--loading-visibility'] = 'block';
+					this.customStyle['--loading-visibility-margin'] = 'auto';
+					this.customStyle['--user-input-visibility'] = 'none';
+					this.updateStyles();
+				}
+			}
 
 			Polymer({
 				is: 'onion-settings-bluetooth',
-				created: created,
+				//created: created,
 				ready: ready,
 				init: init,
-				setLoading: setLoading,
+				getState: getState,
+				onLoading: onLoading,
+				enableBluetoothChanged: enableBluetoothChanged,
+				_setAttributeWithoutObserving: _setAttributeWithoutObserving,
 				properties: {
 					enableBluetooth: {
 						type: Boolean,
 						notify: true,
-						observer: "enableWifiChanged"
+						observer: "enableBluetoothChanged"
 					}
 				}
 			});

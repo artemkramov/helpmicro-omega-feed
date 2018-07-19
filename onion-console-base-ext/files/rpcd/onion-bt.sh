@@ -1,8 +1,11 @@
 #!/bin/sh
 
+# include the Onion sh lib
+. /usr/lib/onion/lib.sh
+
 case "$1" in
    list)
-        echo '{"state": {}, "toto": {}}'
+        echo '{"state": {}, "power": {}}'
    ;;
    call)
         case "$2" in
@@ -10,9 +13,13 @@ case "$1" in
                         # return json object or an array
                         /usr/bin/pybluez/get-adapter-state
                 ;;
-                toto)
-                        # return json object or an array
-                        echo '{}'
+                power)
+			# read the arguments
+			read input;
+			
+			json_load "$input"
+			json_get_var "state" "state"
+			/usr/bin/pybluez/set-adapter-state "$state"	
                 ;;
         esac
    ;;
