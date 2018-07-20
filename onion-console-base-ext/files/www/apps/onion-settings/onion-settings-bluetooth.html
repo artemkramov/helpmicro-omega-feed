@@ -101,6 +101,33 @@
 			animation: rotation 1s infinite linear;
 		}
 		
+		.bluetooth-controls {
+			text-align: right;
+		}
+		
+		#pair-connect-loading {
+			position: absolute;
+			z-index: 30;
+			width: 100%;
+			height: 100%;
+			background-size: cover;
+			color: rgb(130,70,110);
+			top: 0;
+			left: 0;
+			background-color: rgba(255,255,255,0.7);
+			display: var(--pair-connect-visibility);
+			text-align: center;
+		}
+		
+		#pair-connect-loading .onion-settings-bluetooth {
+			height: 100%;
+			width: 50px;
+			-webkit-animation: rotation 5s infinite linear;
+			-moz-animation: rotation 5s infinite linear;
+			-o-animation: rotation 5s infinite linear;
+			animation: rotation 5s infinite linear;
+		}
+		
 		
 	</style>
 
@@ -109,6 +136,9 @@
 			<h4 class="card-title">Bluetooth Setup</h4>
 			<div class="card card-block">
 				<div id="configureLoading" class="loading"></div>
+				<div id="pair-connect-loading">
+					<iron-icon icon="icons:refresh"></iron-icon>
+				</div>
 				<div id="globalControl" class="layout horizontal center">
 					<div class="user-input">Bluetooth Enabled</div>
 					<input type="checkbox" id="enable-bluetooth" checked="{{enableBluetooth::change}}" autocomplete="off" class="user-input" disabled="{{disableInputs}}" />
@@ -120,7 +150,7 @@
 							<button id="bluetooth-scan-btn" type="button" class="btn btn-block btn-primary" on-click="scanBluetoothDevices" disabled="{{disableInputs}}">
 								<span id="scan-refresh-icon" class$="{{_getClass(animated)}}"><iron-icon icon="icons:refresh"></iron-icon></span> Scan devices
 							</button>
-							<table id="bluetooth-devices" class="table">
+							<table class="table">
 								<thead>
 									<tr>
 										<th>Alias</th>
@@ -135,19 +165,20 @@
 										 </tr>
 									</template>
 									<template is="dom-if" if="[[!_isListEmpty(devices)]]">
-										 <template is="dom-repeat" items="{{devices}}">
+										 <template id="bluetoothDevices" is="dom-repeat" items="[[devices]]">
 											 <tr>
 												<td>{{item.Alias}}</td>
 												<td>{{item.Address}}</td>
-												<td>
+												<td class="bluetooth-controls">
 													<template is="dom-if" if="[[!item.Paired]]">
-														<button class="btn btn-default">Pair</button>
+														<button class="btn btn-default" data-addr$="{{item.Address}}" on-click="pairAndConnect" disabled="{{disableInputs}}">Pair and connect</button>
 													</template>
 													<template is="dom-if" if="[[_isDeviceReadyToConnect(item)]]">
-														<button class="btn btn-default">Connect</button>
+														<button class="btn btn-default" data-addr$="{{item.Address}}" on-click="connect" disabled="{{disableInputs}}">Connect</button>
+														<button class="btn btn-default" data-addr$="{{item.Address}}" on-click="removeDevice" disabled="{{disableInputs}}">Remove</button>
 													</template>
 													<template is="dom-if" if="[[item.Connected]]">
-														<button class="btn btn-default">Disonnect</button>
+														<button class="btn btn-default" data-addr$="{{item.Address}}" on-click="disconnect" disabled="{{disableInputs}}">Disconnect</button>
 													</template>
 												</td>
 											 </tr>
@@ -184,6 +215,7 @@
 			};
 
 			var init = function () {
+				this.onPairConnectLoading(false);
 				this.getState();
 			};
 			
@@ -258,6 +290,109 @@
 					});
 			}
 			
+			var pairAndConnect = function (e) {
+				var address = e.target.getAttribute('data-addr');
+				this.onPairConnectLoading(true);
+				var self = this;
+				this.bluetoothProvider.pairDevice(null, address)
+					.then(function(result) {
+						self._updateDeviceStatus(address, 'Paired', 1);
+						self.connectToNetwork(address);
+					}.bind(this))
+					.catch(function (err) {
+						onionConsole.sendNotification({
+							title: 'Error',
+							message: err
+						});
+						self.onPairConnectLoading(false);
+					});
+			}
+			
+			var connect = function (e) {
+				var address = e.target.getAttribute('data-addr');
+				this.onPairConnectLoading(true);
+				this.connectToNetwork(address);
+			}
+			
+			var disconnect = function (e) {
+				var address = e.target.getAttribute('data-addr');
+				this.onPairConnectLoading(true);
+				var self = this;
+				this.bluetoothProvider.disconnectFromDevice(null, address)
+				.then(function(result) {
+					onionConsole.sendNotification({
+						title: 'Success',
+						message: 'Disconnected from network!'
+					});
+					self._updateDeviceStatus(address, 'Connected', 0);
+					self.onPairConnectLoading(false);
+				}.bind(this))
+				.catch(function (err) {
+					onionConsole.sendNotification({
+						title: 'Error',
+						message: err
+					});
+					self.onPairConnectLoading(false);
+				});
+			}
+			
+			var removeDevice = function (e) {
+				var address = e.target.getAttribute('data-addr');
+				this.onPairConnectLoading(true);
+				var self = this;
+				this.bluetoothProvider.removeDevice(null, address)
+				.then(function(result) {
+					onionConsole.sendNotification({
+						title: 'Success',
+						message: 'Remove device successfully!'
+					});
+					self._updateDeviceStatus(address, 'Paired', 0);
+					self.onPairConnectLoading(false);
+				}.bind(this))
+				.catch(function (err) {
+					onionConsole.sendNotification({
+						title: 'Error',
+						message: err
+					});
+					self.onPairConnectLoading(false);
+				});
+			}
+			
+			var connectToNetwork = function (address) {
+				var self = this;
+				this.bluetoothProvider.connectToDevice(null, address)
+				.then(function(result) {
+					onionConsole.sendNotification({
+						title: 'Success',
+						message: 'Connection is established!'
+					});
+					self._updateDeviceStatus(address, 'Connected', 1);
+					self.onPairConnectLoading(false);
+				}.bind(this))
+				.catch(function (err) {
+					onionConsole.sendNotification({
+						title: 'Error',
+						message: err
+					});
+					self.onPairConnectLoading(false);
+				});
+			}
+			
+			var _updateDeviceStatus = function(address, attribute, value) {
+				var self = this;
+				let devices = this.devices;
+				devices.forEach(function(device, index) {
+					if (device.Address == address) {
+						device[attribute] = value;
+					}
+				});
+				this.devices = [];
+				requestAnimationFrame(time => {
+					this.devices = devices;
+				});
+
+			}
+			
 			var _setAttributeWithoutObserving = function (attribute, value) {
 				this._observerLock = true;
 				this[attribute] = value;
@@ -298,6 +433,16 @@
 					this.updateStyles();
 				}
 			}
+			
+			var onPairConnectLoading = function (bLoading) {
+				if (!bLoading) {
+					this.customStyle['--pair-connect-visibility'] = 'none';
+				}
+				else {
+					this.customStyle['--pair-connect-visibility'] = 'block';
+				}
+				this.updateStyles();
+			}
 
 			Polymer({
 				is: 'onion-settings-bluetooth',
@@ -307,11 +452,18 @@
 				getState: getState,
 				onLoading: onLoading,
 				onScanLoading: onScanLoading,
+				onPairConnectLoading: onPairConnectLoading,
 				enableBluetoothChanged: enableBluetoothChanged,
 				scanBluetoothDevices: scanBluetoothDevices,
+				pairAndConnect: pairAndConnect,
+				connect: connect,
+				disconnect: disconnect,
+				connectToNetwork: connectToNetwork,
+				removeDevice: removeDevice,
 				_setAttributeWithoutObserving: _setAttributeWithoutObserving,
 				_setBluetoothEnable: _setBluetoothEnable,
 				_getClass: _getClass,
+				_updateDeviceStatus: _updateDeviceStatus,
 				_isDeviceReadyToConnect: _isDeviceReadyToConnect,
 				_isListEmpty: function (list) {
 					return list.length == 0;
@@ -332,7 +484,8 @@
 					},
 					devices: {
 						type: Array,
-						value: []
+						value: [],
+						notify: true
 					}
 				}
 			});

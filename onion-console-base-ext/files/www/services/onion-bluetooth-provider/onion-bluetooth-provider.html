@@ -68,8 +68,82 @@
 
 				return promise;
 			}
-
 			
+			var pairDevice = function (devId, address) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'pair', {
+						"address": address
+					}, function (err, response) {
+						if (response && !response.err) {
+							resolve(response);
+						} else {
+							var message = 'Unable to pair'
+							if (response.err) {
+								message = response.errMessage;
+							}
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			}
+			
+			var connectToDevice = function (devId, address) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'connect', {
+						"address": address
+					}, function (err, response) {
+						if (response && !response.err) {
+							resolve(response);
+						} else {
+							var message = 'Unable to connect'
+							if (response.err) {
+								message = response.errMessage;
+							}
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			}
+
+			var disconnectFromDevice = function (devId, address) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'disconnect', {
+						"address": address
+					}, function (err, response) {
+						if (response && !response.err) {
+							resolve(response);
+						} else {
+							var message = 'Unable to disconnect'
+							if (response.err) {
+								message = response.errMessage;
+							}
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			}
+			
+			var removeDevice = function (devId, address) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'remove', {
+						"address": address
+					}, function (err, response) {
+						if (response && !response.err) {
+							resolve(response);
+						} else {
+							var message = 'Unable to remove device'
+							if (response.err) {
+								message = response.errMessage;
+							}
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			}
 
 			Polymer({
 				is: 'onion-bluetooth-provider',
@@ -81,6 +155,10 @@
 				getState: getState,
 				setAdapterPower: setAdapterPower,
 				getDevices: getDevices,
+				pairDevice: pairDevice,
+				connectToDevice: connectToDevice,
+				disconnectFromDevice: disconnectFromDevice,
+				removeDevice: removeDevice,
 				properties: {
 				}
 			});

@@ -19,11 +19,15 @@ else:
 bus = dbus.SystemBus()
 
 response = {"isPowerOn": 0, "err": 0}
-adapter_path = bluezutils.find_adapter().object_path
-adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path), "org.freedesktop.DBus.Properties")
 
-adapter.Set(ADAPTER_IFACE, "Powered", value)
-response["isPowerOn"] = adapter.Get(ADAPTER_IFACE, "Powered")
-if response["isPowerOn"] != value:
+try:
+	adapter_path = bluezutils.find_adapter().object_path
+	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path), "org.freedesktop.DBus.Properties")
+
+	adapter.Set(ADAPTER_IFACE, "Powered", value)
+	response["isPowerOn"] = adapter.Get(ADAPTER_IFACE, "Powered")
+	if response["isPowerOn"] != value:
+		response["err"] = 1
+except Exception, e:
 	response["err"] = 1
 print(json.dumps(response))
