@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lede-ecr-app
-PKG_VERSION:=1.0.31
+PKG_VERSION:=1.0.32
 PKG_RELEASE:=1
 PKG_REV:=HEAD
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)
@@ -40,6 +40,7 @@ define Package/lede-ecr-app/install
 	# copy the web site files
 	$(INSTALL_DIR) $(1)/www $(1)/usr/share/lede-ecr-util
 	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)//etc/bluetooth
 	$(INSTALL_DIR) $(1)/etc/dbus-1/system.d/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init.d/ecr $(1)/etc/init.d/ecr
 	$(INSTALL_BIN) ./files/checkWanStatus.sh $(1)/usr/share/lede-ecr-util/checkWanStatus
