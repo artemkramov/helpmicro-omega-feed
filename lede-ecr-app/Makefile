@@ -55,7 +55,7 @@ define Package/lede-ecr-app/postinst
 if [ -z "$${IPKG_INSTROOT}" ]; then
 	/etc/init.d/ecr enable
 	/etc/init.d/wanStatus enable
-	echo "Name = $(uci get wireless.ap.ssid)" >> /etc/bluetooth/main.conf
+	echo "Name = TTT" >> /etc/bluetooth/main.conf
 fi
 exit 0
 endef
