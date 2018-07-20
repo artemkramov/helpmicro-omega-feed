@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lede-ecr-app
-PKG_VERSION:=1.0.30
+PKG_VERSION:=1.0.31
 PKG_RELEASE:=1
 PKG_REV:=HEAD
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)
@@ -54,6 +54,7 @@ define Package/lede-ecr-app/postinst
 if [ -z "$${IPKG_INSTROOT}" ]; then
 	/etc/init.d/ecr enable
 	/etc/init.d/wanStatus enable
+	echo "Name = $(uci get wireless.ap.ssid)" >> /etc/bluetooth/main.conf
 fi
 exit 0
 endef
