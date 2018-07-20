@@ -128,6 +128,42 @@
 			animation: rotation 5s infinite linear;
 		}
 		
+		.card {
+			background-color: #fff;
+		}
+		
+		.card-block:last-child {
+			border-bottom-right-radius: .25rem;
+			border-bottom-left-radius: .25rem;
+		}
+		
+		.status-heading {
+			color: #fff;
+			background-color: #16a085;
+			border-top-left-radius: .25rem;
+			border-top-right-radius: .25rem;
+		}
+		
+		h4 {
+			margin-bottom: 10px;
+		}
+		
+		.card-block > p:last-child {
+			margin-bottom: 0;
+		}
+		
+		#btn-refresh-network {
+			float: right;
+		}
+		
+		.network-state-title {
+			float: left;
+		}
+		.btn-default.active, .btn-default:active, .btn-default:focus, .btn-default:hover {
+			color: #434a54;
+			background-color: #ddd;
+		}
+		
 		
 	</style>
 
@@ -191,6 +227,37 @@
 					
 				</div>
 			</div>
+			
+			<div class="card status user-input bluetoothBlock">
+				<div class="card-block status-heading clearfix">
+					<div class="network-state-title">
+						<template is="dom-if" if="{{networkState.up}}">
+							<h4 class="card-title">{{networkState.ip}}</h4>
+						</template>
+						<template is="dom-if" if="{{!networkState.up}}">
+							<h4 class="card-title">Network is down</h4>
+						</template>
+						<h6 class="card-subtitle">Bluetooth Network</h6>
+					</div>
+					<button class="btn btn-default" id="btn-refresh-network" on-click="refreshNetworkState">
+						<iron-icon icon="icons:refresh"></iron-icon>
+					</button>
+				</div>
+				<template is="dom-if" if="{{networkState.up}}">
+					<div class="card-block">
+						<p>
+							<span>{{networkState.gateway}}</span>
+							<br>
+							<strong>Gateway</strong>
+						</p>
+						<p>
+							<span>{{networkState.l3_device}}</span>
+							<br>
+							<strong>Interface</strong>
+						</p>
+					</div>
+				</template>
+			</div>
 		</div>
 	</template>
 
@@ -216,6 +283,7 @@
 
 			var init = function () {
 				this.onPairConnectLoading(false);
+				this.refreshNetwork();
 				this.getState();
 			};
 			
@@ -225,6 +293,7 @@
 				this.bluetoothProvider.getState(null)
 				.then(function(result){
 					this._setBluetoothEnable(result.isPowerOn);
+					this.devices = result.devices;
 					this.onLoading(false);
 				}.bind(this))
 				.catch(function (err) {
@@ -325,6 +394,7 @@
 						message: 'Disconnected from network!'
 					});
 					self._updateDeviceStatus(address, 'Connected', 0);
+					this.refreshNetwork();
 					self.onPairConnectLoading(false);
 				}.bind(this))
 				.catch(function (err) {
@@ -342,6 +412,7 @@
 				var self = this;
 				this.bluetoothProvider.removeDevice(null, address)
 				.then(function(result) {
+					this.refreshNetwork();
 					onionConsole.sendNotification({
 						title: 'Success',
 						message: 'Remove device successfully!'
@@ -367,6 +438,7 @@
 						message: 'Connection is established!'
 					});
 					self._updateDeviceStatus(address, 'Connected', 1);
+					self.refreshNetwork();
 					self.onPairConnectLoading(false);
 				}.bind(this))
 				.catch(function (err) {
@@ -375,6 +447,28 @@
 						message: err
 					});
 					self.onPairConnectLoading(false);
+				});
+			}
+			
+			var refreshNetworkState = function (e) {
+				this.refreshNetwork();
+			}
+			
+			var refreshNetwork = function () {
+				var self = this;
+				this.bluetoothProvider.getNetworkState(null)
+				.then(function(result) {
+					if (result.up) {
+						result.ip = result["ipv4-address"][0]["address"] + '/' + result["ipv4-address"][0]["mask"];
+						result.gateway = result["route"][0]["target"];
+					}
+					self.networkState = result;
+				}.bind(this))
+				.catch(function (err) {
+					onionConsole.sendNotification({
+						title: 'Error',
+						message: err
+					});
 				});
 			}
 			
@@ -409,8 +503,6 @@
 				}
 				this.updateStyles();
 			}
-			
-			
 			
 			var _getClass = function(animated) {
 				return animated ? "animate" : "";
@@ -460,6 +552,8 @@
 				disconnect: disconnect,
 				connectToNetwork: connectToNetwork,
 				removeDevice: removeDevice,
+				refreshNetwork: refreshNetwork,
+				refreshNetworkState: refreshNetworkState,
 				_setAttributeWithoutObserving: _setAttributeWithoutObserving,
 				_setBluetoothEnable: _setBluetoothEnable,
 				_getClass: _getClass,
@@ -486,6 +580,16 @@
 						type: Array,
 						value: [],
 						notify: true
+					},
+					networkState: {
+						type: Object,
+						notify: true,
+						value: function() {
+							return {
+								'gateway': '-',
+								'l3_device': '-'
+							};
+						}
 					}
 				}
 			});

@@ -6,7 +6,7 @@ import dbus
 import json
 
 bus = dbus.SystemBus()
-response = {"isPowerOn": 0, "isDeviceDetected": 0}
+response = {"isPowerOn": 0, "isDeviceDetected": 0, "devices": []}
 
 manager = dbus.Interface(bus.get_object("org.bluez", "/"),
 					"org.freedesktop.DBus.ObjectManager")
@@ -19,6 +19,17 @@ for path, interfaces in objects.iteritems():
 	properties = interfaces["org.bluez.Adapter1"]
 	response["isDeviceDetected"] = 1
 	response["isPowerOn"] = properties["Powered"]
+	om = dbus.Interface(bus.get_object("org.bluez", "/"), "org.freedesktop.DBus.ObjectManager")
+	objects = om.GetManagedObjects()
+	for path, interfaces in objects.iteritems():
+		if "org.bluez.Device1" in interfaces:
+			device = interfaces["org.bluez.Device1"]
+			response["devices"].append({
+				"Alias": device["Alias"],
+				"Address": device["Address"],
+				"Paired": device["Paired"],
+				"Connected": device["Connected"]
+			})
 	break
 
 print(json.dumps(response))

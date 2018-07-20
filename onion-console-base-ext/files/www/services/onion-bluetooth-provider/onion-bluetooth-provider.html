@@ -144,6 +144,22 @@
 				}.bind(this));
 				return promise;
 			}
+			
+			var getNetworkState = function (devId) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "network.interface.bnep0", 'status', {
+						
+					}, function (err, response) {
+						if (response) {
+							resolve(response);
+						} else {
+							var message = 'Unable to fetch network status';
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			}
 
 			Polymer({
 				is: 'onion-bluetooth-provider',
@@ -159,6 +175,7 @@
 				connectToDevice: connectToDevice,
 				disconnectFromDevice: disconnectFromDevice,
 				removeDevice: removeDevice,
+				getNetworkState: getNetworkState,
 				properties: {
 				}
 			});

@@ -47,6 +47,9 @@
                                 "onion-bt": [
                                         "*"
                                 ],
+				"network.interface.bnep0": [
+					"status"
+				],
                         },
                         "uci": [
                                 "get",
