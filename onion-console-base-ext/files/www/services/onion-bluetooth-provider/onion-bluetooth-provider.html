@@ -78,7 +78,7 @@
 							resolve(response);
 						} else {
 							var message = 'Unable to pair'
-							if (response.err) {
+							if (response && response.err) {
 								message = response.errMessage;
 							}
 							reject(message);
@@ -97,7 +97,7 @@
 							resolve(response);
 						} else {
 							var message = 'Unable to connect'
-							if (response.err) {
+							if (response && response.err) {
 								message = response.errMessage;
 							}
 							reject(message);
@@ -116,7 +116,7 @@
 							resolve(response);
 						} else {
 							var message = 'Unable to disconnect'
-							if (response.err) {
+							if (response && response.err) {
 								message = response.errMessage;
 							}
 							reject(message);
@@ -135,7 +135,7 @@
 							resolve(response);
 						} else {
 							var message = 'Unable to remove device'
-							if (response.err) {
+							if (response && response.err) {
 								message = response.errMessage;
 							}
 							reject(message);
