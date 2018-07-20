@@ -5,7 +5,7 @@
 
 case "$1" in
    list)
-        echo '{"state": {}, "power": {}, "scan": {}}'
+        echo '{"state": {}, "power": {}, "scan": {}, "pair": {}, "connect": {}, "disconnect": {}, "remove": {}}'
    ;;
    call)
         case "$2" in
@@ -23,6 +23,30 @@ case "$1" in
                 ;;
 		scan)
 			/usr/bin/pybluez/scan-devices
+		;;
+		pair)
+			read input;
+			json_load "$input"
+			json_get_var "address" "address"
+			/usr/bin/pybluez/pair "$address"
+		;;
+		connect)
+			read input;
+			json_load "$input"
+			json_get_var "address" "address"
+			/usr/bin/pybluez/connect-to-network "$address"
+		;;
+		disconnect)
+			read input;
+			json_load "$input"
+			json_get_var "address" "address"
+			/usr/bin/pybluez/connect-to-network "$address" 1
+		;;
+		remove)
+			read input;
+			json_load "$input"
+			json_get_var "address" "address"
+			/usr/bin/pybluez/remove-device "$address"
 		;;
         esac
    ;;
