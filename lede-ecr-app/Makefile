@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lede-ecr-app
-PKG_VERSION:=1.0.32
+PKG_VERSION:=1.0.33
 PKG_RELEASE:=1
 PKG_REV:=HEAD
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)
@@ -20,7 +20,7 @@ define Package/lede-ecr-app
 	CATEGORY:=ECR
 	SECTION:=ECR
 	TITLE:=ECR proxy app
-	DEPENDS:=+uci +firewall +nodejs +bluez-daemon
+	DEPENDS:=+uci +firewall +nodejs +bluez-daemon +libuci
 endef
 
 
@@ -55,7 +55,7 @@ define Package/lede-ecr-app/postinst
 if [ -z "$${IPKG_INSTROOT}" ]; then
 	/etc/init.d/ecr enable
 	/etc/init.d/wanStatus enable
-	echo "Name = TTT" >> /etc/bluetooth/main.conf
+	uci set bluetooth.@bluetoothd[0].config='test'
 fi
 exit 0
 endef
