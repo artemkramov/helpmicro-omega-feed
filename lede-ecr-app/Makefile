@@ -40,11 +40,13 @@ define Package/lede-ecr-app/install
 	# copy the web site files
 	$(INSTALL_DIR) $(1)/www $(1)/usr/share/lede-ecr-util
 	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)//etc/bluetooth
 	$(INSTALL_DIR) $(1)/etc/dbus-1/system.d/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init.d/ecr $(1)/etc/init.d/ecr
 	$(INSTALL_BIN) ./files/checkWanStatus.sh $(1)/usr/share/lede-ecr-util/checkWanStatus
 	$(INSTALL_BIN) ./files/wanStatus $(1)/etc/init.d/wanStatus
+	$(INSTALL_BIN) ./files/uci-defaults/50-bluetooth-set-name $(1)/etc/uci-defaults/50-bluetooth-set-name
 	$(INSTALL_DATA) ./files/bluetooth.conf $(1)/etc/dbus-1/system.d/bluetooth.conf
 	$(CP) -r $(PKG_BUILD_DIR)/ecr-app $(1)/www
 endef
@@ -55,8 +57,6 @@ define Package/lede-ecr-app/postinst
 if [ -z "$${IPKG_INSTROOT}" ]; then
 	/etc/init.d/ecr enable
 	/etc/init.d/wanStatus enable
-	uci set bluetooth.@bluetoothd[0].config='test'
-	uci commit
 fi
 exit 0
 endef
