@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lede-ecr-app
-PKG_VERSION:=1.0.33
+PKG_VERSION:=1.0.34
 PKG_RELEASE:=1
 PKG_REV:=HEAD
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)
@@ -56,6 +56,7 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 	/etc/init.d/ecr enable
 	/etc/init.d/wanStatus enable
 	uci set bluetooth.@bluetoothd[0].config='test'
+	uci commit
 fi
 exit 0
 endef
