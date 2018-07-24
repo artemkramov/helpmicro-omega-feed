@@ -5,49 +5,64 @@
 
 case "$1" in
    list)
-        echo '{"state": {}, "power": {}, "scan": {}, "pair": {}, "connect": {}, "disconnect": {}, "remove": {}}'
+        echo '{"state": {}, "power": {}, "scan": {}, "pair": {}, "connect": {}, "disconnect": {}, "remove": {}, "set3G": {}}'
    ;;
    call)
         case "$2" in
-                state)
-                        # return json object or an array
-                        /usr/bin/pybluez/get-adapter-state
-                ;;
-                power)
-			# read the arguments
-			read input;
-			
-			json_load "$input"
-			json_get_var "state" "state"
-			/usr/bin/pybluez/set-adapter-state "$state"	
-                ;;
-		scan)
-			/usr/bin/pybluez/scan-devices
-		;;
-		pair)
-			read input;
-			json_load "$input"
-			json_get_var "address" "address"
-			/usr/bin/pybluez/pair "$address"
-		;;
-		connect)
-			read input;
-			json_load "$input"
-			json_get_var "address" "address"
-			/usr/bin/pybluez/connect-to-network "$address"
-		;;
-		disconnect)
-			read input;
-			json_load "$input"
-			json_get_var "address" "address"
-			/usr/bin/pybluez/connect-to-network "$address" 1
-		;;
-		remove)
-			read input;
-			json_load "$input"
-			json_get_var "address" "address"
-			/usr/bin/pybluez/remove-device "$address"
-		;;
+			state)
+					# return json object or an array
+					/usr/bin/pybluez/get-adapter-state
+			;;
+			power)
+				# read the arguments
+				read input;
+				
+				json_load "$input"
+				json_get_var "state" "state"
+				/usr/bin/pybluez/set-adapter-state "$state"	
+			;;
+			scan)
+				/usr/bin/pybluez/scan-devices
+			;;
+			pair)
+				read input;
+				json_load "$input"
+				json_get_var "address" "address"
+				/usr/bin/pybluez/pair "$address"
+			;;
+			connect)
+				read input;
+				json_load "$input"
+				json_get_var "address" "address"
+				/usr/bin/pybluez/connect-to-network "$address"
+			;;
+			disconnect)
+				read input;
+				json_load "$input"
+				json_get_var "address" "address"
+				/usr/bin/pybluez/connect-to-network "$address" 1
+			;;
+			remove)
+				read input;
+				json_load "$input"
+				json_get_var "address" "address"
+				/usr/bin/pybluez/remove-device "$address"
+			;;
+			set3G)
+				read input;
+				json_load "$input"
+				json_get_vars section modemService modemPinCode modemApn modemDialNumber modemUsername modemPassword modemPppdOptions
+
+				uci set network.$section.service=$modemService
+				uci set network.$section.pincode=$modemPinCode
+				uci set network.$section.apn=$modemApn
+				uci set network.$section.dialnumber=$modemDialNumber
+				uci set network.$section.username=$modemUsername
+				uci set network.$section.password=$modemPassword
+				uci set network.$section.pppd_options=$modemPppdOptions
+				uci commit
+				echo '{"success": true}'
+			;;
         esac
    ;;
 esac

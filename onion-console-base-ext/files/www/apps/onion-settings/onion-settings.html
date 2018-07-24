@@ -13,6 +13,7 @@
 <link rel="import" href="./onion-settings-cloud.html">
 <link rel="import" href="./onion-settings-status.html">
 <link rel="import" href="./onion-settings-bluetooth.html">
+<link rel="import" href="./onion-settings-3g.html">
 
 
 <dom-module id="onion-settings">
@@ -79,6 +80,7 @@
     						<onion-settings-update id="onion-settings-update"></onion-settings-update>
     						<onion-settings-restore id="onion-settings-restore"></onion-settings-restore>
 							<onion-settings-bluetooth id="onion-settings-bluetooth"></onion-settings-bluetooth>
+							<onion-settings-3g id="onion-settings-3g"></onion-settings-3g>
     					</iron-pages>
                     </div>
 					
@@ -135,6 +137,11 @@
 						name: 'Bluetooth',
 						icon: 'icons:settings-bluetooth',
 						page: 'onion-settings-bluetooth'
+					},
+					{
+						name: '3G',
+						icon: 'icons:hardware:sim-card',
+						page: 'onion-settings-3g'
 					}
 				];
 			};
