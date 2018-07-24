@@ -14,7 +14,7 @@ import bluezutils
 
 adapter = {}
 mainloop = {}
-TIMEOUT = 8000
+TIMEOUT = 11000
 
 def handler():
 	adapter.StopDiscovery()
