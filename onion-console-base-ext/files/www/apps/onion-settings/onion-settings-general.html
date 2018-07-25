@@ -12,9 +12,34 @@
 			margin-top: 15px;
 			background-color: #fff;
 		}
-			.card .form-group:last-child {
-				margin-bottom: 0;
-			}
+
+		.card .form-group:last-child {
+			margin-bottom: 0;
+		}
+		
+		#clear-lease-loading {
+			position: absolute;
+			z-index: 30;
+			width: 100%;
+			height: 100%;
+			background-size: cover;
+			color: rgb(130,70,110);
+			top: 0;
+			left: 0;
+			background-color: rgba(255,255,255,0.7);
+			display: var(--clear-lease-visibility);
+			text-align: center;
+		}
+		
+		#clear-lease-loading .onion-settings-general {
+			height: 100%;
+			width: 50px;
+			-webkit-animation: rotation 5s infinite linear;
+			-moz-animation: rotation 5s infinite linear;
+			-o-animation: rotation 5s infinite linear;
+			animation: rotation 5s infinite linear;
+		}
+		
 	</style>
 
 	<template>
@@ -79,6 +104,17 @@
 					<!-- save settings -->
 					<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
 						<button id="wifi-config-button" type="button" class="btn btn-success btn-block" on-tap="saveSettings">Save Settings</button>
+					</div>
+				</div>
+				
+				<div class="card card-block">
+					<div id="clear-lease-loading">
+						<iron-icon icon="icons:refresh"></iron-icon>
+					</div>
+					<div class="form-group row">
+						<div class="form-control-label">
+							<button class="btn btn-danger" type="button" on-click="clearLeases">Clear leases</button>
+						</div>	
 					</div>
 				</div>
 			</form>
@@ -196,6 +232,7 @@
 			};
 
 			var init = function () {
+				this.onClearLeasesLoading(false);
 				onionConsole.getService('onion-ubus-provider', (function (err, ubus) {
 					ubus.request('uci', 'get', {
 						config: 'system',
@@ -219,6 +256,27 @@
 						}
 					}).bind(this));
 	            }).bind(this));
+			};
+			
+			var clearLeases = function () {
+				this.onClearLeasesLoading(true);
+				var self = this;
+				onionConsole.getService('onion-device-settings-provider', (function (err, device) {
+					device.clearLeases(devId)
+					.then((function () {
+						onionConsole.sendNotification({
+							title: 'Success!',
+							message: 'Leases were cleared!'
+						});
+						self.onClearLeasesLoading(false);
+					}).bind(this), (function (err) {
+						onionConsole.sendNotification({
+							title: 'Error',
+							message: err
+						});
+						self.onClearLeasesLoading(false);
+					}).bind(this));
+				}).bind(this));
 			};
 
 			var saveSettings = function () {
@@ -299,12 +357,24 @@
 					}).bind(this));
 				}
 			};
+			
+			var onClearLeasesLoading = function (bLoading) {
+				if (!bLoading) {
+					this.customStyle['--clear-lease-visibility'] = 'none';
+				}
+				else {
+					this.customStyle['--clear-lease-visibility'] = 'block';
+				}
+				this.updateStyles();
+			};
 
 			Polymer({
 				is: 'onion-settings-general',
 				init: init,
 				ready: ready,
 				saveSettings: saveSettings,
+				clearLeases: clearLeases,
+				onClearLeasesLoading: onClearLeasesLoading,
 				_calculateTimezoneLabel: _calculateTimezoneLabel,
 				_calculateTimezoneValue: _calculateTimezoneValue
 			});

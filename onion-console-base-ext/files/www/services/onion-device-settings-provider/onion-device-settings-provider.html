@@ -441,6 +441,57 @@
 				});
 				return rebootPromise;
 			};
+			
+			var getFiscalDeviceStatus = function (devId) {
+				var message = 'Unable to fetch fiscal device status';
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "network.interface.usb0", 'status', {
+					}, function (err, response) {
+						if (response) {
+							if (response.up) {
+								this.deviceProvider.callService(devId, "onion-bt", 'getLeases', {
+								}, function (err, responseLeases) {
+									if (responseLeases) {
+										if (responseLeases.address) {
+											response.lease = responseLeases;
+										}
+										resolve(response);
+									} else {
+										reject(message);
+									}
+								}.bind(this));
+							}
+							else {
+								response.lease = {
+									ip: '-',
+									address: '-',
+									device: '-'
+								};
+								resolve(response);
+							}
+						} else {
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			};
+			
+			var clearLeases = function (devId) {
+				var message = "Unable to clear leases";
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'clearLeases', {
+					}, function (err, response) {
+						if (response && response.success) {
+							resolve(response);
+						}
+						else {
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			}; 
 
 			Polymer({
 				is: 'onion-device-settings-provider',
@@ -475,7 +526,9 @@
 				changeTimezone: changeTimezone,
 
 				shutdown: shutdown,
-				reboot: reboot
+				reboot: reboot,
+				getFiscalDeviceStatus: getFiscalDeviceStatus,
+				clearLeases: clearLeases
 			});
 		})();
 	</script>

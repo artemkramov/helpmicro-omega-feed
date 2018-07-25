@@ -35,6 +35,9 @@
                                 "network.interface.wwan": [
                                         "status"
                                 ],
+                                "network.interface.usb0": [
+                                        "status"
+                                ],
                                 "network.interface": [
                                         "dump"
                                 ],

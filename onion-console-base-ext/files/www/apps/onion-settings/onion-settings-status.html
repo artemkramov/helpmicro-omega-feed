@@ -188,23 +188,23 @@
 
                 <div class="card status">
                     <div class="card-block status-heading">
-                        <h4 class="card-title">{{received}}</h4>
-                        <h6 class="card-subtitle">Bytes Received</h6>
+                        <h4 class="card-title">Fiscal device: 
+							<template is="dom-if" if="{{fiscalDeviceUp}}">
+								online
+							</template>
+							<template is="dom-if" if="{{!fiscalDeviceUp}}">
+								offline
+							</template>
+						</h4>
+                        <h6 class="card-subtitle">Fiscal device status</h6>
                     </div>
                     <div class="card-block">
-                        <p class="card-text">The is the total number of bytes received by the Omega</p>
+                        <p><span>{{fiscalDeviceIP}}</span><br><strong>IP</strong></p>
+						<p><span>{{fiscalDeviceAlias}}</span><br><strong>Device alias</strong></p>
+						<p><span>{{fiscalDeviceAddress}}</span><br><strong>Address</strong></p>
                     </div>
                 </div>
 
-                <div class="card status">
-                    <div class="card-block status-heading">
-                        <h4 class="card-title">{{transmitted}}</h4>
-                        <h6 class="card-subtitle">Bytes Transmitted</h6>
-                    </div>
-                    <div class="card-block">
-                        <p class="card-text">The is the total number of bytes transmitted by the Omega</p>
-                    </div>
-                </div>
     		</div>
         </div>
 
@@ -325,6 +325,11 @@
 							}
 						}).bind(this));
 					}).bind(this), 1000);
+					
+					var self = this;
+					setInterval(function () {
+						self.updateFiscalDeviceStatus();
+					}, 3000);
 
 
 
@@ -360,6 +365,9 @@
 					//Get received and transmitted bytes
 					this.updateRxTx();
 					this.refreshRxTx(10000);
+					
+					// Update fiscal device status
+					this.updateFiscalDeviceStatus();
 
 					//Get the disk usage
 					this.updateDiskUsage();
@@ -375,6 +383,20 @@
 			var stopRefreshRxTx = function () {
 			    clearInterval(this.refreshRxTxInterval);
 				delete this.refreshRxTxInterval;
+			};
+			
+			var updateFiscalDeviceStatus = function () {
+				this.deviceSettingsProvider.getFiscalDeviceStatus(null).then(function(result){
+					this.fiscalDeviceUp = result.up;
+					if (result.lease) {
+						this.fiscalDeviceIP = result.lease.ip;
+						this.fiscalDeviceAddress = result.lease.address;
+						this.fiscalDeviceAlias = result.lease.device;
+					}
+				}.bind(this))
+				.catch(function (err) {
+					
+				});
 			};
 
 			var updateRxTx = function () {
@@ -483,12 +505,17 @@
 				displayStorageSize: displayStorageSize,
 				isOmega2: isOmega2,
 				isOmega: isOmega,
+				updateFiscalDeviceStatus: updateFiscalDeviceStatus,
 				properties:{
 					hostname: String,
 					device: {
 						type: String,
 						value: '',
 						notify: true
+					},
+					fiscalDeviceUp: {
+						type: Boolean,
+						value: false
 					}
 				}
 				//refreshStatus: refreshStatus,

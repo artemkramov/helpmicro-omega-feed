@@ -5,13 +5,13 @@
 
 case "$1" in
    list)
-        echo '{"state": {}, "power": {}, "scan": {}, "pair": {}, "connect": {}, "disconnect": {}, "remove": {}, "set3G": {}}'
+        echo '{"state": {}, "power": {}, "scan": {}, "pair": {}, "connect": {}, "disconnect": {}, "remove": {}, "set3G": {}, "getLeases": {}, "clearLeases": {}}'
    ;;
    call)
         case "$2" in
 			state)
-					# return json object or an array
-					/usr/bin/pybluez/get-adapter-state
+				# return json object or an array
+				/usr/bin/pybluez/get-adapter-state
 			;;
 			power)
 				# read the arguments
@@ -63,6 +63,28 @@ case "$1" in
 				uci commit
 				echo '{"success": true}'
 			;;
+			getLeases)
+				ip="192.168.8.100"
+				record=$(cat /tmp/dhcp.leases | grep "$ip")
+				delimiter=' '
+				device='-'
+				address='-'
+				if [ ! -z "$record" ]
+				then
+						device=$(echo "$record" | cut -d "$delimiter" -f 4)
+						address=$(echo "$record" | cut -d "$delimiter" -f 2)
+				else
+						ip='-'
+				fi
+				echo '{"ip": "'$ip'", "device": "'$device'", "address": "'$address'"}'
+
+			;;
+			clearLeases)
+				echo "" > /tmp/dhcp.leases
+				/etc/init.d/dnsmasq restart
+				echo '{"success": true}'
+			;;
+
         esac
    ;;
 esac
