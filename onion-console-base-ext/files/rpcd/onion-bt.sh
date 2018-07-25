@@ -65,18 +65,18 @@ case "$1" in
 			;;
 			getLeases)
 				ip="192.168.8.100"
-				record=$(cat /tmp/dhcp.leases | grep "$ip")
+				record=$(cat /proc/net/arp | grep "$ip")
 				delimiter=' '
 				device='-'
 				address='-'
 				if [ ! -z "$record" ]
 				then
-						device=$(echo "$record" | cut -d "$delimiter" -f 4)
-						address=$(echo "$record" | cut -d "$delimiter" -f 2)
+								address=$(echo "$record" | awk -F ' ' '{print $4}')
 				else
-						ip='-'
+								ip='-'
 				fi
 				echo '{"ip": "'$ip'", "device": "'$device'", "address": "'$address'"}'
+
 
 			;;
 			clearLeases)
