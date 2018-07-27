@@ -79,6 +79,26 @@
 				transform: rotate(359deg)
 			}
 		}
+		
+		#btn-refresh-network-3g {
+			float: right;
+		}
+		
+		.network-state-title {
+			float: left;
+		}
+		.btn-default.active, .btn-default:active, .btn-default:focus, .btn-default:hover {
+			color: #434a54;
+			background-color: #ddd;
+		}
+		
+		.status-heading {
+			color: #fff;
+			background-color: #16a085;
+			border-top-left-radius: .25rem;
+			border-top-right-radius: .25rem;
+		}
+		
 	</style>
 
 	<template>
@@ -98,23 +118,34 @@
 					<!-- </div> -->
 
 					<fieldset>
+						
+						<div class="form-group row">
+							<label for="modem-device" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 form-control-label">Device</label>
+							<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+								<div class="row">
+									<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+										<select class="form-control c-select" id="modem-device" autocomplete="off" value="{{modemDevice::input}}">
+											<template is="dom-repeat" items="{{devices}}" as="device" >
+												<option value$={{getDevicePath(device)}} selected$="{{isDeviceSelected(device)}}">{{device}}</option>
+											  </template>
+										</select>
+									</div>
+									<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+										<button type="button" class="btn btn-default" on-click="refreshDeviceList"><iron-icon icon="icons:refresh"></iron-icon></button>
+									</div>
+								</div>
+							</div>
+						</div>
+					
 						<div class="form-group row">
 							<label for="modem-service" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 form-control-label">Service</label>
 							<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
 								<select class="form-control c-select" id="modem-service" autocomplete="off" value="{{modemService::input}}">
-									<option value="cdma">CDMA</option>
-									<option value="evdo">EVDO</option>
-									<option value="umts">UMTS</option>
+									<option value="umts">UMTS/GPRS</option>
 									<option value="umts_only">UMTS only</option>
 									<option value="gprs_only">GPRS only</option>
+									<option value="evdo">CDMA/EV-DO</option>
 								</select>
-							</div>
-						</div>
-						
-						<div class="form-group row">
-							<label for="modem-pin-code" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 form-control-label">PIN code</label>
-							<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-								<input type="text" class="form-control" id="modem-pin-code" autocomplete="off" value="{{modemPinCode::input}}" />
 							</div>
 						</div>
 						
@@ -126,9 +157,9 @@
 						</div>
 						
 						<div class="form-group row">
-							<label for="modem-dial-number" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 form-control-label">Dial number</label>
+							<label for="modem-pin-code" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 form-control-label">PIN code</label>
 							<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-								<input type="text" class="form-control" id="modem-dial-number" autocomplete="off" value="{{modemDialNumber::input}}" />
+								<input type="text" class="form-control" id="modem-pin-code" autocomplete="off" value="{{modemPinCode::input}}" />
 							</div>
 						</div>
 						
@@ -142,7 +173,15 @@
 						<div class="form-group row">
 							<label for="modem-password" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 form-control-label">Password</label>
 							<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-								<input type="text" class="form-control" id="modem-password" autocomplete="off" value="{{modemPassword::input}}" />
+								<input type="password" class="form-control" id="modem-password" autocomplete="off" value="{{modemPassword::input}}" />
+							</div>
+						</div>
+						
+						
+						<div class="form-group row">
+							<label for="modem-dial-number" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 form-control-label">Dial number</label>
+							<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+								<input type="text" class="form-control" id="modem-dial-number" autocomplete="off" value="{{modemDialNumber::input}}" />
 							</div>
 						</div>
 						
@@ -169,7 +208,47 @@
 							</div>
 						</div>
 					</div>
+					
+					<div class="form-group row">
+						<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+							<div class="layout horizontal center">
+								<button type="button" class="btn btn-danger" on-click="restartNetworkService">Restart network service</button>
+							</div>
+						</div>
+					</div>
+					
 				</form>
+			</div>
+			
+			<div class="card status user-input modemBlock">
+				<div class="card-block status-heading clearfix">
+					<div class="network-state-title">
+						<template is="dom-if" if="{{networkState.up}}">
+							<h4 class="card-title">{{networkState.ip}}</h4>
+						</template>
+						<template is="dom-if" if="{{!networkState.up}}">
+							<h4 class="card-title">Network is down</h4>
+						</template>
+						<h6 class="card-subtitle">3G Network</h6>
+					</div>
+					<button class="btn btn-default" id="btn-refresh-network-3g" on-click="refreshNetwork">
+						<iron-icon icon="icons:refresh"></iron-icon>
+					</button>
+				</div>
+				<template is="dom-if" if="{{networkState.up}}">
+					<div class="card-block">
+						<p>
+							<span>{{networkState.nextHop}}</span>
+							<br>
+							<strong>Next hop</strong>
+						</p>
+						<p>
+							<span>{{networkState.l3_device}}</span>
+							<br>
+							<strong>Interface</strong>
+						</p>
+					</div>
+				</template>
 			</div>
 		</div>
 	</template>
@@ -204,28 +283,33 @@
 
 			var init = function () {
 				this.refreshConfigInfo();
+				this.refreshNetwork();
 			};
 			
 			var refreshConfigInfo = function () {
 				var promise = new Promise(function (resolve, reject) {
 					this.setLoading(true);
-
+					var self = this;
 					var getConfigPromise 	= this.modemProvider.getInterfaceConfig(null);
 
 					Promise.all([getConfigPromise])
 					.then(function(values) {
 						var data = values[0].values;
-						this.set('modemService', data.service);
-						this.set('modemPinCode', data.pincode);
-						this.set('modemApn', data.apn);
-						this.set('modemDialNumber', data.dialnumber);
-						this.set('modemUsername', data.username);
-						this.set('modemPassword', data.password);
-						this.set('modemPppdOptions', data.pppd_options);
+						self.set('modemDevice', data.device);
+						self.set('modemService', data.service);
+						self.set('modemPinCode', data.pincode);
+						self.set('modemApn', data.apn);
+						self.set('modemDialNumber', data.dialnumber);
+						self.set('modemUsername', data.username);
+						self.set('modemPassword', data.password);
+						self.set('modemPppdOptions', data.pppd_options);
 						// disable the loading
-						this.setLoading(false);
-						// resolve the promise
-						resolve();
+						self.setLoading(false);
+						this.getDevices().
+						then(function() {	
+							// resolve the promise
+							resolve();
+						}).bind(this);
 					}.bind(this));
 				}.bind(this));
 
@@ -255,9 +339,10 @@
 					verifyResult = 'Please enter an APN';
 				}
 				
-				if (!this.modemDialNumber || this.modemDialNumber === '') {
-					verifyResult = 'Please enter an dial number';
+				if (!this.modemDevice || this.modemDevice === '') {
+					verifyResult = 'Please choose the device';
 				}
+				
 				var propertyList = this.properties;
 				var attributes = {};
 				for (var attribute in propertyList) {
@@ -287,6 +372,74 @@
 					this.setLoading(false);
 				}
 			}
+			
+			var getDevices = function () {
+				var promise = new Promise(function (resolve, reject) {
+					this.setLoading(true);
+					var self = this;
+					this.modemProvider.getUSBDevices(null)
+						.then(function (response) {
+							self.devices = response.devices;
+							self.setLoading(false);
+							resolve();
+						}.bind(this))
+						.catch(function (err) {
+							self.setLoading(false);
+							reject();
+						}.bind(this));
+				}.bind(this));
+
+				return promise;	
+			}
+			
+			var restartNetworkService = function () {
+				var self = this;
+				if (confirm("Your connection can be lost. Continue?")) {
+					this.setLoading(true);
+					this.modemProvider.restartNetworkService(null)
+						.then(function (response) {
+							self.setLoading(false);
+							onionConsole.sendNotification({
+								title: 'Success',
+								message: 'Network service was restarted!'
+							});
+						}.bind(this))
+						.catch(function (err) {
+							self.setLoading(false);
+						}.bind(this));
+				}
+			}
+			
+			var refreshDeviceList = function () {
+				this.getDevices();
+			}
+			
+			var getDevicePath = function (device) {
+				return "/dev/" + device;
+			}
+			
+			var isDeviceSelected = function (device) {
+				return this.getDevicePath(device) == this.modemDevice;
+			}
+			
+			var refreshNetwork = function () {
+				var self = this;
+				this.modemProvider.getNetworkState(null)
+				.then(function(result) {
+					if (result.up) {
+						result.ip = result["ipv4-address"][0]["address"] + '/' + result["ipv4-address"][0]["mask"];
+						result.nextHop = result["route"][0]["nexthop"];
+					}
+					self.networkState = result;
+				}.bind(this))
+				.catch(function (err) {
+					onionConsole.sendNotification({
+						title: 'Error',
+						message: err
+					});
+				});
+			}
+
 
 			Polymer({
 				is: 'onion-settings-3g',
@@ -296,7 +449,22 @@
 				setLoading: setLoading,
 				refreshConfigInfo: refreshConfigInfo,
 				setupModem: setupModem,
+				getDevices: getDevices,
+				getDevicePath: getDevicePath,
+				isDeviceSelected: isDeviceSelected,
+				refreshDeviceList: refreshDeviceList,
+				restartNetworkService: restartNetworkService,
+				refreshNetwork: refreshNetwork, 
 				properties: {
+					devices: {
+						type: Array,
+						notify: true,
+						value: []
+					},
+					modemDevice: {
+						type: String,
+						notify: true
+					},
 					modemService: {
 						type: String,
 						notify: true
@@ -328,6 +496,16 @@
 						notify: true,
 						value: ''
 					},
+					networkState: {
+						type: Object,
+						notify: true,
+						value: function() {
+							return {
+								'nextHop': '-',
+								'l3_device': '-'
+							};
+						}
+					}
 				}
 			});
 		})();

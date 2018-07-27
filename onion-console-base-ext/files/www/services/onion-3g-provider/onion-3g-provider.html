@@ -66,6 +66,52 @@
 
 				return promise;
 			}
+			
+			var getUSBDevices = function (devId) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'getUSBDevices', {
+					}, function (err, response) {
+						if (response && !err && response.devices) {
+							resolve(response);
+						} else {
+							var message = 'Unable to fetch devices';
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			}
+			
+			var restartNetworkService = function (devId) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'restartNetwork', {
+					}, function (err, response) {
+						if (response && !err) {
+							resolve(response);
+						} else {
+							var message = 'Unable to restart network service';
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			}
+			
+			var getNetworkState = function (devId) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "network.interface.ppp0", 'status', {
+						
+					}, function (err, response) {
+						if (response) {
+							resolve(response);
+						} else {
+							var message = 'Unable to fetch network status';
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			}
 
 			Polymer({
 				is: 'onion-3g-provider',
@@ -75,6 +121,9 @@
 
 				getInterfaceConfig: getInterfaceConfig,
 				setInterfaceConfig: setInterfaceConfig,
+				getUSBDevices: getUSBDevices,
+				restartNetworkService: restartNetworkService,
+				getNetworkState: getNetworkState,
 				properties: {
 				}
 			});

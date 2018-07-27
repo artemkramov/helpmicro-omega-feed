@@ -38,6 +38,9 @@
                                 "network.interface.usb0": [
                                         "status"
                                 ],
+				"network.interface.ppp0": [
+					"status"
+				],
                                 "network.interface": [
                                         "dump"
                                 ],

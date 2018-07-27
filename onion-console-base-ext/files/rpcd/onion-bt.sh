@@ -5,7 +5,7 @@
 
 case "$1" in
    list)
-        echo '{"state": {}, "power": {}, "scan": {}, "pair": {}, "connect": {}, "disconnect": {}, "remove": {}, "set3G": {}, "getLeases": {}, "clearLeases": {}}'
+        echo '{"state": {}, "power": {}, "scan": {}, "pair": {}, "connect": {}, "disconnect": {}, "remove": {}, "set3G": {}, "getLeases": {}, "clearLeases": {}, "getUSBDevices": {}, "restartNetwork": {}}'
    ;;
    call)
         case "$2" in
@@ -51,8 +51,9 @@ case "$1" in
 			set3G)
 				read input;
 				json_load "$input"
-				json_get_vars section modemService modemPinCode modemApn modemDialNumber modemUsername modemPassword modemPppdOptions
+				json_get_vars section modemDevice modemService modemPinCode modemApn modemDialNumber modemUsername modemPassword modemPppdOptions
 
+				uci set network.$section.device=$modemDevice
 				uci set network.$section.service=$modemService
 				uci set network.$section.pincode=$modemPinCode
 				uci set network.$section.apn=$modemApn
@@ -84,7 +85,14 @@ case "$1" in
 				/etc/init.d/dnsmasq restart
 				echo '{"success": true}'
 			;;
-
+			getUSBDevices)
+				devices=$(ls /dev/ | grep tty[A-Z]* | while read line; do echo \""$line"\" ; done | tr '\n' ',' | sed '$ s/.$//')
+				echo "{\"devices\":["$devices"]}"
+			;;
+			restartNetwork)
+				/etc/init.d/network restart
+				echo "{}"
+			;;
         esac
    ;;
 esac
