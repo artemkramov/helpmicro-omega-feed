@@ -67,7 +67,7 @@ define Package/onion-console-base-ext/install
 	$(INSTALL_BIN) ./files/pybluez/remove-device $(1)/usr/bin/pybluez/remove-device
 	$(INSTALL_BIN) ./files/pybluez/bluezutils.py $(1)/usr/bin/pybluez/bluezutils.py
 	
-	$(INSTALL_BIN) ./files/www/scripts/ping.py $(1)/www/scripts/ping.py
+	$(INSTALL_BIN) ./files/www/scripts/ping.py $(1)/www/console/scripts/ping.py
 
 	# Create the services directory
 	$(INSTALL_DIR) $(1)/www/console/services
