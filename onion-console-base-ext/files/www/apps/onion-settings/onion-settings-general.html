@@ -52,6 +52,58 @@
 			display: inline-block;
 		}
 		
+		@-webkit-keyframes rotation {
+			from{
+				-webkit-transform: rotate(0deg)
+			}
+			to{
+				-webkit-transform: rotate(359deg)
+			}
+		}
+
+		@-moz-keyframes rotation {
+			from{
+				-moz-transform: rotate(0deg)
+			}
+			to{
+				-moz-transform: rotate(359deg)
+			}
+		}
+
+		@-o-keyframes rotation {
+			from{
+				-o-transform: rotate(0deg)
+			}
+			to{
+				-o-transform: rotate(359deg)
+			}
+		}
+
+		@keyframes rotation {
+			from{
+				transform: rotate(0deg)
+			}
+			to{
+				transform: rotate(359deg)
+			}
+		}
+		
+		.loading{
+			height: 20px;
+			width: 20px;
+			margin-left: 15px;
+			-webkit-animation: rotation 1s infinite linear;
+			-moz-animation: rotation 1s infinite linear;
+			-o-animation: rotation 1s infinite linear;
+			animation: rotation 1s infinite linear;
+			border-left: 3px solid #EAF1FF;
+			border-right: 3px solid #EAF1FF;
+			border-bottom: 3px solid #EAF1FF;
+			border-top: 3px solid #2450AD;
+			border-radius: 100%;
+			display: inline-block;
+		}
+		
 	</style>
 
 	<template>
@@ -127,6 +179,10 @@
 						<div class="form-control-label">
 							<button class="btn btn-danger" type="button" on-click="clearLeases">Clear leases</button>
 						</div>
+						<div class="form-control-label">
+							<button type="button" id="restart-network-button" class="btn btn-danger" on-click="restartNetworkService">Restart network service</button>
+							<div id="restartingNetwork" class="loading" hidden></div>
+						</div>	
 						<div class="form-control-label">
 							<button class="btn btn-primary" type="button" on-click="testPing" disabled="{{disableInputs}}">
 								<span id="ping-refresh-icon" class$="{{_getClass(animated)}}"><iron-icon icon="icons:refresh"></iron-icon></span>
@@ -282,6 +338,36 @@
 	            }).bind(this));
 			};
 			
+			var setLoading = function (bLoading) {
+				if (bLoading) {
+					this.$.restartingNetwork.hidden = false;
+			    	this.$['restart-network-button'].disabled = true;
+				} else {
+					this.$.restartingNetwork.hidden = true;
+		    		this.$['restart-network-button'].disabled = false;
+				}
+			};
+			
+			var restartNetworkService = function () {
+				var self = this;
+				if (confirm("Your connection can be lost. Continue?")) {
+					onionConsole.getService('onion-device-settings-provider', (function (err, device) {
+						this.setLoading(true);
+						device.restartNetworkService(null)
+							.then(function (response) {
+								self.setLoading(false);
+								onionConsole.sendNotification({
+									title: 'Success',
+									message: 'Network service was restarted!'
+								});
+							}.bind(this))
+							.catch(function (err) {
+								self.setLoading(false);
+							}.bind(this));
+					}).bind(this));
+				}
+			}
+			
 			var clearLeases = function () {
 				this.onClearLeasesLoading(true);
 				var self = this;
@@ -412,6 +498,7 @@
 				}
 			}
 			
+			
 			var onClearLeasesLoading = function (bLoading) {
 				if (!bLoading) {
 					this.customStyle['--clear-lease-visibility'] = 'none';
@@ -429,6 +516,8 @@
 				saveSettings: saveSettings,
 				clearLeases: clearLeases,
 				testPing: testPing,
+				restartNetworkService: restartNetworkService,
+				setLoading: setLoading,
 				onIframeLoad: onIframeLoad,
 				onClearLeasesLoading: onClearLeasesLoading,
 				onPingLoading: onPingLoading,

@@ -491,7 +491,22 @@
 					}.bind(this));
 				}.bind(this));
 				return promise;
-			}; 
+			};
+			
+			var restartNetworkService = function (devId) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'restartNetwork', {
+					}, function (err, response) {
+						if (response && !err) {
+							resolve(response);
+						} else {
+							var message = 'Unable to restart network service';
+							reject(message);
+						}
+					}.bind(this));
+				}.bind(this));
+				return promise;
+			}
 
 			Polymer({
 				is: 'onion-device-settings-provider',
@@ -528,7 +543,8 @@
 				shutdown: shutdown,
 				reboot: reboot,
 				getFiscalDeviceStatus: getFiscalDeviceStatus,
-				clearLeases: clearLeases
+				clearLeases: clearLeases,
+				restartNetworkService: restartNetworkService
 			});
 		})();
 	</script>
