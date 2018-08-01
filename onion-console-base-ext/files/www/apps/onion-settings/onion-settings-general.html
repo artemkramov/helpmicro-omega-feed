@@ -40,6 +40,18 @@
 			animation: rotation 5s infinite linear;
 		}
 		
+		.iframe-ping {
+			margin-top: 20px;
+		}
+		
+		#ping-refresh-icon.animate {
+			-webkit-animation: rotation 1s infinite linear;
+			-moz-animation: rotation 1s infinite linear;
+			-o-animation: rotation 1s infinite linear;
+			animation: rotation 1s infinite linear;
+			display: inline-block;
+		}
+		
 	</style>
 
 	<template>
@@ -114,7 +126,18 @@
 					<div class="form-group row">
 						<div class="form-control-label">
 							<button class="btn btn-danger" type="button" on-click="clearLeases">Clear leases</button>
-						</div>	
+						</div>
+						<div class="form-control-label">
+							<button class="btn btn-primary" type="button" on-click="testPing" disabled="{{disableInputs}}">
+								<span id="ping-refresh-icon" class$="{{_getClass(animated)}}"><iron-icon icon="icons:refresh"></iron-icon></span>
+								Test internet connection
+							</button>
+							<template is="dom-if" if="[[showPingIframe]]">
+								 <tr>
+									<iframe id="iframe-ping" width="100%" class="iframe-ping" height="100%" on-load="onIframeLoad" src="/console/scripts/ping.py"></iframe>
+								 </tr>
+							</template>
+						</div>
 					</div>
 				</div>
 			</form>
@@ -233,6 +256,7 @@
 
 			var init = function () {
 				this.onClearLeasesLoading(false);
+				this.onPingLoading(false);
 				onionConsole.getService('onion-ubus-provider', (function (err, ubus) {
 					ubus.request('uci', 'get', {
 						config: 'system',
@@ -278,6 +302,21 @@
 					}).bind(this));
 				}).bind(this));
 			};
+			
+			var testPing = function () {
+				this.onPingLoading(true);
+				if (!this.showPingIframe) {
+					this.showPingIframe = true;
+				}
+				var iframe = this.$$('#iframe-ping');
+				if (iframe) {
+					iframe.contentWindow.location.reload(); 
+				}
+			}
+			
+			var onIframeLoad = function () {
+				this.onPingLoading(false);
+			}
 
 			var saveSettings = function () {
 				// If user wants to change password, change it
@@ -358,6 +397,21 @@
 				}
 			};
 			
+			var _getClass = function(animated) {
+				return animated ? "animate" : "";
+			}
+			
+			var onPingLoading = function (bLoading) {
+				if (bLoading) {
+					this.disableInputs = true;
+					this.animated = true;
+				}
+				else {
+					this.disableInputs = false;
+					this.animated = false;
+				}
+			}
+			
 			var onClearLeasesLoading = function (bLoading) {
 				if (!bLoading) {
 					this.customStyle['--clear-lease-visibility'] = 'none';
@@ -374,9 +428,27 @@
 				ready: ready,
 				saveSettings: saveSettings,
 				clearLeases: clearLeases,
+				testPing: testPing,
+				onIframeLoad: onIframeLoad,
 				onClearLeasesLoading: onClearLeasesLoading,
+				onPingLoading: onPingLoading,
+				_getClass: _getClass,
 				_calculateTimezoneLabel: _calculateTimezoneLabel,
-				_calculateTimezoneValue: _calculateTimezoneValue
+				_calculateTimezoneValue: _calculateTimezoneValue,
+				properties: {
+					showPingIframe: {
+						type: Boolean,
+						value: false
+					},
+					animated: {
+						type: Boolean,
+						value: false
+					},
+					disableInputs: {
+						type: Boolean,
+						value: false,
+					}
+				}
 			});
         })();
 	</script>

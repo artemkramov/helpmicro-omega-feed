@@ -5,7 +5,7 @@
 
 case "$1" in
    list)
-        echo '{"state": {}, "power": {}, "scan": {}, "pair": {}, "connect": {}, "disconnect": {}, "remove": {}, "set3G": {}, "getLeases": {}, "clearLeases": {}, "getUSBDevices": {}, "restartNetwork": {}}'
+        echo '{"getDevices": {}, "scanStop": {}, "state": {}, "power": {}, "scan": {}, "pair": {}, "connect": {}, "disconnect": {}, "remove": {}, "set3G": {}, "getLeases": {}, "clearLeases": {}, "getUSBDevices": {}, "restartNetwork": {}}'
    ;;
    call)
         case "$2" in
@@ -93,6 +93,14 @@ case "$1" in
 				/etc/init.d/network restart
 				echo "{}"
 			;;
+			scanStop)
+				killall scan-devices
+				echo "{}"
+			;;
+			getDevices)
+				/usr/bin/pybluez/get-devices
+			;;
+
         esac
    ;;
 esac

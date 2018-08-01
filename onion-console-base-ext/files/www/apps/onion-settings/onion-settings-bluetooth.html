@@ -101,6 +101,10 @@
 			animation: rotation 1s infinite linear;
 		}
 		
+		#bluetooth-scan-stop-btn {
+			display: var(--bluetooth-stop-button);
+		}
+		
 		.bluetooth-controls {
 			text-align: right;
 		}
@@ -185,6 +189,9 @@
 						<div class="bluetooth-scan">
 							<button id="bluetooth-scan-btn" type="button" class="btn btn-block btn-primary" on-click="scanBluetoothDevices" disabled="{{disableInputs}}">
 								<span id="scan-refresh-icon" class$="{{_getClass(animated)}}"><iron-icon icon="icons:refresh"></iron-icon></span> Scan devices
+							</button>
+							<button id="bluetooth-scan-stop-btn" type="button" class="btn btn-block btn-danger" on-click="stopScanBluetoothDevices">
+								<iron-icon icon="icons:clear"></iron-icon> Stop devices scanning
 							</button>
 							<table class="table">
 								<thead>
@@ -283,6 +290,7 @@
 
 			var init = function () {
 				this.onPairConnectLoading(false);
+				this.onScanLoading(false);
 				this.refreshNetwork();
 				this.getState();
 			};
@@ -332,30 +340,60 @@
 			
 			var onScanLoading = function (bLoading) {
 				if (bLoading) {
+					this.customStyle['--bluetooth-stop-button'] = 'block';
 					this.disableInputs = true;
 					this.animated = true;
 				}
 				else {
+					this.customStyle['--bluetooth-stop-button'] = 'none';
 					this.disableInputs = false;
 					this.animated = false;
+					if (this.interval) {
+						clearInterval(this.interval);
+					}
 				}
+				this.updateStyles();
 			}
 			
 			var scanBluetoothDevices = function () {
 				this.onScanLoading(true);
 				var self = this;
-				this.bluetoothProvider.getDevices(null)
+				this.interval = setInterval(function () {
+					self.getBluetoothDevices();
+				}, 4000);
+				this.bluetoothProvider.scanDevices(null)
 					.then(function(result) {
-						self.devices = result.devices;
+						//self.devices = result.devices;
 						this.onScanLoading(false);
 					}.bind(this))
 					.catch(function (err) {
-						self.devices = [];
-						onionConsole.sendNotification({
-							title: 'Error',
-							message: err
-						});
+						//self.devices = [];
+						//onionConsole.sendNotification({
+						//	title: 'Error',
+						//	message: err
+						//});
+						self.onScanLoading(false);
+					});
+			}
+			
+			var getBluetoothDevices = function () {
+				var self = this;
+				this.bluetoothProvider.getDevices(null)
+					.then(function(result) {
+						self.devices = result.devices;
+					}.bind(this))
+					.catch(function (err) {
+					});
+			}
+			
+			var stopScanBluetoothDevices = function () {
+				var self = this;
+				this.bluetoothProvider.stopScan(null)
+				.then(function(result) {
 						this.onScanLoading(false);
+					}.bind(this))
+					.catch(function (err) {
+						self.onScanLoading(false);
 					});
 			}
 			
@@ -547,6 +585,7 @@
 				onPairConnectLoading: onPairConnectLoading,
 				enableBluetoothChanged: enableBluetoothChanged,
 				scanBluetoothDevices: scanBluetoothDevices,
+				stopScanBluetoothDevices: stopScanBluetoothDevices,
 				pairAndConnect: pairAndConnect,
 				connect: connect,
 				disconnect: disconnect,
@@ -554,11 +593,13 @@
 				removeDevice: removeDevice,
 				refreshNetwork: refreshNetwork,
 				refreshNetworkState: refreshNetworkState,
+				getBluetoothDevices: getBluetoothDevices,
 				_setAttributeWithoutObserving: _setAttributeWithoutObserving,
 				_setBluetoothEnable: _setBluetoothEnable,
 				_getClass: _getClass,
 				_updateDeviceStatus: _updateDeviceStatus,
 				_isDeviceReadyToConnect: _isDeviceReadyToConnect,
+				interval: undefined,
 				_isListEmpty: function (list) {
 					return list.length == 0;
 				},

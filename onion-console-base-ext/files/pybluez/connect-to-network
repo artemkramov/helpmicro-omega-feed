@@ -40,6 +40,9 @@ try:
 		iface = network.Connect(service)
 	else:
 		network.Disconnect()
+except dbus.DBusException, e:
+	response["err"] = 1
+	response["errMessage"] = "Unable to connect to the network. Check your modem settings."
 except Exception, e:
 	response["err"] = 1
 	response["errMessage"] = str(e)

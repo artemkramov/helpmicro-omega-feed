@@ -53,9 +53,40 @@
 				return promise;
 			}
 			
-			var getDevices = function (devId) {
+			var scanDevices = function (devId) {
 				var promise = new Promise(function (resolve, reject) {
 					this.deviceProvider.callService(devId, "onion-bt", 'scan', {
+						
+					}, function (err, response) {
+						if (response) {
+							resolve(response);
+						} else {
+							reject('Unable to fetch devices.');
+						}
+					}.bind(this));
+				}.bind(this));
+
+				return promise;
+			}
+			
+			var stopScan = function (devId) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'scanStop', {
+					}, function (err, response) {
+						if (!err) {
+							resolve(response);
+						} else {
+							reject('Unable to stop discovery.');
+						}
+					}.bind(this));
+				}.bind(this));
+
+				return promise;
+			}
+			
+			var getDevices = function (devId) {
+				var promise = new Promise(function (resolve, reject) {
+					this.deviceProvider.callService(devId, "onion-bt", 'getDevices', {
 						
 					}, function (err, response) {
 						if (response && response.devices) {
@@ -170,6 +201,8 @@
 				//Get state
 				getState: getState,
 				setAdapterPower: setAdapterPower,
+				scanDevices: scanDevices,
+				stopScan: stopScan,
 				getDevices: getDevices,
 				pairDevice: pairDevice,
 				connectToDevice: connectToDevice,
