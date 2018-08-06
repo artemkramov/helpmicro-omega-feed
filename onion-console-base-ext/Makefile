@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 PKG_NAME:=onion-console-base-ext
-PKG_VERSION:=0.1.5
+PKG_VERSION:=0.1.6
 PKG_RELEASE:=1
 
 
@@ -18,7 +18,7 @@ define Package/onion-console-base-ext
 	CATEGORY:=ECR
 	SUBMENU:=Console
 	TITLE:=Extended web-based virtual desktop for the Omega
-	DEPENDS:=+rpcd
+	DEPENDS:=+rpcd +oupgrade
 endef
 
 define Package/onion-console-base-ext/description
@@ -31,6 +31,7 @@ define Package/onion-console-base-ext/install
 	$(INSTALL_BIN) ./files/acl.d/onion-console.json $(1)/usr/share/rpcd/acl.d/onion-console.json
 	# install scripts
 	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./files/bin/factory-reset.sh $(1)/usr/sbin/factory-reset
 	$(INSTALL_BIN) ./files/bin/power-down.sh $(1)/usr/sbin/power-down
 	$(INSTALL_BIN) ./files/bin/change-password.sh $(1)/usr/sbin/change-password
