@@ -35,6 +35,7 @@ define Package/onion-console-base-ext/install
 	$(INSTALL_BIN) ./files/bin/power-down.sh $(1)/usr/sbin/power-down
 	$(INSTALL_BIN) ./files/bin/change-password.sh $(1)/usr/sbin/change-password
 	$(INSTALL_BIN) ./files/bin/disk-space.sh $(1)/usr/sbin/disk-space
+	$(INSTALL_BIN) ./files/bin/oupgrade.sh $(1)/usr/bin/oupgrade
 	# install the rpcd script
 	$(INSTALL_DIR) $(1)/usr/libexec/rpcd
 	$(INSTALL_BIN) ./files/rpcd/onion-console.sh $(1)/usr/libexec/rpcd/onion-console
