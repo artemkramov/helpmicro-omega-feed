@@ -92,6 +92,7 @@ define Package/onion-console-base-ext/install
 	cp ./files/www/.bowerrc $(1)/www/console/.bowerrc
 	cp ./files/www/bower.json $(1)/www/console/bower.json
 	cp ./files/www/index.html $(1)/www/console/index.html
+	cp ./files/www/info.json $(1)/www/console/info.json
 	# copy the apps into the directory
 	# copy the launcher app
 	cp -r ./files/www/apps/onion-launcher/* $(1)/www/console/apps/onion-launcher/.
