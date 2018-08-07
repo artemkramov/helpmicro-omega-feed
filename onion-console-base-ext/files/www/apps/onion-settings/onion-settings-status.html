@@ -201,6 +201,11 @@
                     <div class="card-block">
                         <p><span>{{fiscalDeviceIP}}</span><br><strong>IP</strong></p>
 						<p><span>{{fiscalDeviceAddress}}</span><br><strong>Address</strong></p>
+						<template is="dom-if" if="[[fiscalDeviceReady]]">							
+							<p>
+								<a class="btn btn-success" href="[[getFiscalDeviceWebPage()]]" target="__blank">Go to web page</a>
+							</p>
+						</template>
                     </div>
                 </div>
 
@@ -468,6 +473,10 @@
 					return '32';
 				}
 			};
+			
+			var isFiscalDeviceReady = function () {
+				this.fiscalDeviceReady = (this.fiscalDeviceUp && this.fiscalDeviceIP.length > 3);
+			};
 
 			/*
 			var refreshStatus = function (interval) {
@@ -489,6 +498,14 @@
 				});
 			};
 			*/
+			
+			var _fiscalDeviceIPChanged = function () {
+				this.isFiscalDeviceReady();
+			};
+			
+			var getFiscalDeviceWebPage = function () {
+				return window.location.origin + ':5050';
+			};
 
 			Polymer({
 				is: 'onion-settings-status',
@@ -505,6 +522,9 @@
 				isOmega2: isOmega2,
 				isOmega: isOmega,
 				updateFiscalDeviceStatus: updateFiscalDeviceStatus,
+				isFiscalDeviceReady: isFiscalDeviceReady,
+				_fiscalDeviceIPChanged: _fiscalDeviceIPChanged,
+				getFiscalDeviceWebPage: getFiscalDeviceWebPage,
 				properties:{
 					hostname: String,
 					device: {
@@ -513,6 +533,15 @@
 						notify: true
 					},
 					fiscalDeviceUp: {
+						type: Boolean,
+						value: false,
+						notify: true
+					},
+					fiscalDeviceIP: {
+						type: String,
+						observer: '_fiscalDeviceIPChanged'
+					},
+					fiscalDeviceReady: {
 						type: Boolean,
 						value: false
 					}
