@@ -77,6 +77,7 @@ define Package/miniupnpd/install
 	$(INSTALL_DATA) ./files/upnp.leases $(1)/usr/share/miniupnpd/upnp.leases
 	$(INSTALL_DATA) ./files/miniupnpd.hotplug $(1)/etc/hotplug.d/iface/50-miniupnpd
 	$(INSTALL_DATA) ./files/miniupnpd.defaults $(1)/etc/uci-defaults/99-miniupnpd
+	$(INSTALL_DATA) ./files/uci-defaults/51-friendly-name $(1)/etc/uci-defaults/51-friendly-name
 	$(INSTALL_DATA) ./files/firewall.include $(1)/usr/share/miniupnpd/firewall.include
 endef
 
